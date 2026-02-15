@@ -1,0 +1,1797 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Title</title>
+<style>
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding:16px; background:#f6f6f6; }
+  h3 { margin:0 0 10px; }
+
+  .panel { background:#fff; border:1px solid #ddd; border-radius:12px; padding:12px; margin-bottom:12px; }
+  label { display:block; font-size:12px; opacity:0.8; margin-bottom:4px; }
+  select, input { width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:10px; font-size:13px; }
+  button { padding:8px 12px; border-radius:10px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+  .pill { background:#f5f5f5; border:1px solid #e3e3e3; border-radius:999px; padding:6px 10px; font-size:13px; }
+
+  /* ========== Dashboard layout ========== */
+  .dashboard{
+    display: grid;
+    grid-template-columns: 380px minmax(520px, 1fr) 380px;
+    gap: 12px;
+    align-items: start;
+  }
+  .rightCol{ display:grid; gap:12px; }
+
+  .chartsStack{ display:grid; gap:12px; margin-top:10px; }
+  .chartCard { background:#fff; border:1px solid #eee; border-radius:12px; padding:10px; }
+  .chartTitle { font-size:13px; margin-bottom:6px; }
+  .legend { font-size:12px; margin-top:6px; max-width:340px; }
+
+  .chartsPanel canvas, .chartsPanelRight canvas{ width:100%; height:auto; }
+
+  @media (max-width: 1300px){
+    .dashboard{ grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 800px){
+    .chartsPanel canvas,
+    .chartsPanelRight canvas{
+      width: min(100%, 260px);
+      display: block;
+      margin: 0 auto;
+    }
+  }
+
+  /* ========== Slicers ========== */
+  .slicerRow{
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .slicer{ min-width: 160px; }
+  .searchSlicer{ flex: 1 1 420px; min-width: 320px; }
+  .buttonsSlicer{ min-width: 90px; }
+
+  /* Search tabs + input in a "boxy" control */
+  .searchBox{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #cfcfcf;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .searchTabs{
+    display: flex;
+    background: #f4f4f4;
+    border-bottom: 1px solid #d8d8d8;
+  }
+  .searchTabs input[type="radio"]{ display:none; }
+  .searchTabs label{
+    flex: 1;
+    text-align:center;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border-right: 1px solid #d8d8d8;
+    user-select: none;
+  }
+  .searchTabs label:last-child{ border-right:none; }
+  .searchTabs label:hover{ background:#eaeaea; }
+  .searchTabs input[type="radio"]:checked + label{
+    background:#fff;
+    box-shadow: inset 0 -2px 0 0 #2b6cff;
+    font-weight: 600;
+  }
+  .searchInput{
+    border: none;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+    border-radius: 0;
+  }
+  .searchInput:focus{ background:#fafcff; }
+
+  @media (max-width: 900px){
+    .slicer{ min-width: 140px; }
+    .searchTabs label{ font-size: 11px; padding:6px 6px; }
+  }
+
+  /* ========== Map ========== */
+  #mapBox { width:800px; height:600px; border:2px solid #333; background:#ccc; border-radius:10px; overflow:hidden; margin:0 auto; display:flex; align-items:center; justify-content:center; }
+  canvas.map { width:800px; height:600px; display:block; cursor:grab; flex:0 0 auto; }
+  canvas.map.dragging { cursor:grabbing; }
+  canvas.map.lassoing { cursor:crosshair; }
+  #status { margin-top:10px; font-size:13px; text-align:center; }
+
+  /* ========== Table ========== */
+  #tableWrap { max-height:260px; overflow:auto; border:1px solid #eee; border-radius:10px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:6px 8px; border-bottom:1px solid #eee; text-align:left; }
+  th { background:#fafafa; position: sticky; top:0; z-index:1; }
+  tr.selected { background: rgba(255, 215, 0, 0.22); }
+  tr.hoverMatch { outline: 2px solid rgba(0, 90, 255, 0.35); background: rgba(0, 90, 255, 0.06); }
+
+  /* ========== Tooltip ========== */
+  #chartTip{
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(20,20,20,0.92);
+    color: white;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.2;
+    display: none;
+    max-width: 260px;
+  }
+
+  #markerTip{
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(20,20,20,0.92);
+    color: white;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.2;
+    display: none;
+    max-width: 300px;
+    white-space: nowrap;
+  }
+
+  /* ========== Dual-ended time range (FINAL FIX) ========== */
+  .timeRangeWrap{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  /* Outer container: allow thumbs to stick out at edges */
+  .timeRange{
+    position: relative;
+    width: min(520px, 100%);
+    height: 34px;
+    border: 1px solid #cfcfcf;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;           /* IMPORTANT: don't clip thumbs at min/max */
+    padding: 0 6px;              /* gives a little room at edges */
+    box-sizing: border-box;
+  }
+
+  /* Clip only the fill so it respects rounded corners */
+  .timeRangeClip{
+    position:absolute;
+    top:0; bottom:0;
+    left:6px; right:6px;
+    border-radius: 12px;
+    overflow:hidden;
+    pointer-events:none;
+  }
+
+  .timeRangeFill{
+    position:absolute;
+    top:0; bottom:0;
+    background: rgba(43,108,255,0.18);
+    border-left: 2px solid rgba(43,108,255,0.55);
+    border-right: 2px solid rgba(43,108,255,0.55);
+    left: 0%;
+    width: 0%;
+  }
+
+  .timeSlider{
+    position:absolute;
+    top:0; bottom:0;
+    left:0px; right:0px;         /* match clip inset */
+    width: calc(100% - 12px);
+    height: 34px;
+    margin: 0;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Put END on top, but only its thumb is clickable */
+  #timeEnd{
+    z-index: 3;
+    pointer-events: none;
+  }
+  #timeStart::-webkit-slider-thumb{
+  transform: translate(-6px, -6px); /* X left, Y up */
+}
+
+#timeStart::-moz-range-thumb{
+  transform: translate(-6px, -6px);
+}
+
+  .timeSlider::-webkit-slider-runnable-track{ height: 34px; background: transparent; }
+  .timeSlider::-moz-range-track{ height: 34px; background: transparent; }
+
+  /* Thumbs: centered + visible, no "too low" look */
+  .timeSlider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width: 16px;
+    height: 26px;
+    border-radius: 8px;
+    background: #2b6cff;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    cursor: ew-resize;
+
+    /* more consistent than margin-top across browsers */
+    transform: translateY(-6px);
+  }
+
+  .timeSlider::-moz-range-thumb{
+    width: 16px;
+    height: 26px;
+    border-radius: 8px;
+    background: #2b6cff;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    cursor: ew-resize;
+  }
+
+  /* Re-enable pointer events ONLY on the end thumb */
+  #timeEnd::-webkit-slider-thumb{ pointer-events: auto; }
+  #timeEnd::-moz-range-thumb{ pointer-events: auto; }
+</style>
+
+</head>
+
+<body>
+<h3>Title</h3>
+
+<!-- ========================= TOP CONTROLS ========================= -->
+<div class="panel">
+  <div class="slicerRow">
+    <div class="slicer">
+      <label for="pocSelect">POC</label>
+      <select id="pocSelect"></select>
+    </div>
+
+    <div class="slicer">
+      <label for="equipSelect">Equipment</label>
+      <select id="equipSelect"></select>
+    </div>
+
+    <div class="slicer">
+      <label for="collectionSelect">Collection</label>
+      <select id="collectionSelect"></select>
+    </div>
+
+    <div class="slicer searchSlicer">
+      <label>Search</label>
+      <div class="searchBox">
+        <div class="searchTabs">
+          <input type="radio" name="searchField" id="sf-imsi" value="imsi" checked>
+          <label for="sf-imsi">IMSI</label>
+
+          <input type="radio" name="searchField" id="sf-imei" value="imei">
+          <label for="sf-imei">IMEI</label>
+
+          <input type="radio" name="searchField" id="sf-country" value="country">
+          <label for="sf-country">Country</label>
+
+          <input type="radio" name="searchField" id="sf-provider" value="provider">
+          <label for="sf-provider">Provider</label>
+        </div>
+
+        <input id="searchText" class="searchInput" placeholder="Search IMSI…" />
+      </div>
+    </div>
+
+    <div class="slicer buttonsSlicer">
+      <label>&nbsp;</label>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <div class="slicer buttonsSlicer">
+      <label>&nbsp;</label>
+      <button id="refreshBtn">Refresh Data</button>
+    </div>
+  </div>
+
+  <div class="row timeRangeWrap">
+    <span class="pill"><b>Time range</b></span>
+
+    <div class="timeRange" title="Drag start/end handles">
+	<div class="timeRangeClip">
+      <div id="timeRangeFill" class="timeRangeFill"></div>
+	  </div>
+      <input id="timeStart" class="timeSlider" type="range" min="0" max="0" value="0" step="1" />
+      <input id="timeEnd"   class="timeSlider" type="range" min="0" max="0" value="0" step="1" />
+    </div>
+
+    <span id="timeLabel" class="pill">—</span>
+    <span class="pill">Drag: pan • Wheel: zoom • Shift+drag: lasso filter • Click marker: filter • Hover/click to filter</span>
+  </div>
+
+  <div class="row">
+    <span id="countPill" class="pill">0 visible</span>
+    <span id="matchPill" class="pill">0 match filters</span>
+    <span id="selPill" class="pill">Selected: 0</span>
+    <span id="filterPill" class="pill">Filters: —</span>
+  </div>
+</div>
+
+<!-- ========================= DASHBOARD ========================= -->
+<div class="dashboard">
+  <!-- LEFT: charts -->
+  <div class="panel chartsPanel">
+    <div class="row" style="justify-content:space-between;">
+    </div>
+
+    <div class="chartsStack">
+      <div class="chartCard">
+        <div class="chartTitle"><b>IMSI (first 5 digits)</b></div>
+        <canvas id="imsiPie" width="340" height="260"></canvas>
+        <div id="imsiLegend" class="legend"></div>
+      </div>
+
+      <div class="chartCard">
+        <div class="chartTitle"><b>Device (from IMEI TAC)</b></div>
+        <canvas id="devicePie" width="340" height="260"></canvas>
+        <div id="deviceLegend" class="legend"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIDDLE: map + table -->
+  <div class="rightCol">
+    <div class="panel">
+      <div id="mapBox">
+        <canvas id="map" class="map" width="800" height="600"></canvas>
+      </div>
+      <div id="status">Starting…</div>
+    </div>
+
+    <div class="panel">
+      <div id="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>IMSI</th><th>IMEI</th><th>Country</th><th>Provider</th>
+              <th>Created</th><th>Lon</th><th>Lat</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: country/provider charts -->
+  <div class="panel chartsPanelRight">
+    <div class="row" style="justify-content:space-between;">
+    </div>
+
+    <div class="chartsStack">
+      <div class="chartCard">
+        <div class="chartTitle"><b>Country</b></div>
+        <canvas id="countryPie" width="340" height="260"></canvas>
+        <div id="countryLegend" class="legend"></div>
+      </div>
+
+      <div class="chartCard">
+        <div class="chartTitle"><b>Provider</b></div>
+        <canvas id="providerPie" width="340" height="260"></canvas>
+        <div id="providerLegend" class="legend"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="chartTip"></div>
+<div id="markerTip"></div>
+
+<script>
+(() => {
+  // ======================================================
+  // CONFIG
+  // ======================================================
+  const CFG = {
+    // WMS
+    WMS_BASE_URL: "https://wms.gebco.net/mapserv",
+    WMS_VERSION: "1.3.0",
+    FORMAT: "image/jpeg",
+    LAYERS: "GEBCO_LATEST_SUB_ICE_TOPO",
+    CRS: "EPSG:4326",
+    AXIS_ORDER: "latlon", // try "lonlat" if needed
+
+    // Viewport
+    VIEW_W: 800,
+    VIEW_H: 600,
+
+    // Zoom caps
+    MIN_RES: 1e-6,
+    MAX_RES: 360 / 800,
+
+    // Buffering / stitching
+    BUF_W: 2048,
+    BUF_H: 1536,
+    BUFFER_COVERAGE: 3.0,
+
+    // Network control
+    FETCH_DEBOUNCE_MS: 350,
+    MIN_CALL_INTERVAL_MS: 1200,
+
+    // UX
+    DRAG_THRESHOLD_PX: 5,
+    EDGE_DUP_PX: 30,
+  };
+
+  // ======================================================
+  // SAMPLE DATA / API
+  // ======================================================
+  const now = Date.now();
+
+  const TAC_MAP = {
+    // Real make/model requires a TAC DB.
+  };
+
+  const fallbackMarkers = [
+    { id: 1, lon: 2.11,  lat: 13.52,  poc:"Alex",   equipment:"Kit-A", collection:"Niamey-01", imsi:"310150123456789", imei:"356789012345678", country:"Niger",   provider:"Orange",   createdAt: now - 1000*60*60*24*7 },
+    { id: 2, lon: 2.15,  lat: 13.56,  poc:"Bryant", equipment:"Kit-C", collection:"Niamey-01", imsi:"310150777888999", imei:"356333333333333", country:"Niger",   provider:"Airtel",   createdAt: now - 1000*60*60*24*3 },
+    { id: 3, lon: -179.2,lat: 16.90,  poc:"Sam",    equipment:"Kit-A", collection:"Dateline-A",imsi:"999001234567890", imei:"351000000000001", country:"Fiji",    provider:"Vodafone", createdAt: now - 1000*60*60*24*2.2 },
+    { id: 4, lon: 179.5, lat: 17.10,  poc:"Sam",    equipment:"Kit-A", collection:"Dateline-B",imsi:"999011234567891", imei:"351000000000002", country:"Fiji",    provider:"Vodafone", createdAt: now - 1000*60*60*24*2.1 },
+    { id: 5, lon: -74.0, lat: 40.71,  poc:"Bryant", equipment:"Kit-B", collection:"NYC-02",    imsi:"310410999111222", imei:"352099001234560", country:"USA",     provider:"AT&T",     createdAt: now - 1000*60*60*24*2 },
+    { id: 6, lon: 10.18, lat: 36.80,  poc:"Alex",   equipment:"Kit-B", collection:"Tunis-07",  imsi:"605021234567890", imei:"356111111111111", country:"Tunisia", provider:"Ooredoo",  createdAt: now - 1000*60*60*24*1.5 },
+    { id: 7, lon: 3.38,  lat: 6.52,   poc:"Sam",    equipment:"Kit-A", collection:"Lagos-05",  imsi:"621201234567890", imei:"351222222222222", country:"Nigeria", provider:"MTN",      createdAt: now - 1000*60*60*12 },
+  ];
+  let allMarkers = [...fallbackMarkers];
+
+  // ======================================================
+  // DOM
+  // ======================================================
+  const canvas = document.getElementById("map");
+  const ctx = canvas.getContext("2d");
+  const statusEl = document.getElementById("status");
+  const rowsEl = document.getElementById("rows");
+
+  const pocSelect = document.getElementById("pocSelect");
+  const equipSelect = document.getElementById("equipSelect");
+  const collectionSelect = document.getElementById("collectionSelect");
+
+  const searchText = document.getElementById("searchText");
+  const searchFieldRadios = Array.from(document.querySelectorAll('input[name="searchField"]'));
+  const resetBtn = document.getElementById("resetBtn");
+  const refreshBtn = document.getElementById("refreshBtn");
+
+  const timeStart = document.getElementById("timeStart");
+  const timeEnd   = document.getElementById("timeEnd");
+  const timeLabel = document.getElementById("timeLabel");
+  const timeRangeFill = document.getElementById("timeRangeFill");
+
+  const countPill = document.getElementById("countPill");
+  const matchPill = document.getElementById("matchPill");
+  const selPill = document.getElementById("selPill");
+  const filterPill = document.getElementById("filterPill");
+
+  const imsiPie = document.getElementById("imsiPie");
+  const devicePie = document.getElementById("devicePie");
+  const imsiLegend = document.getElementById("imsiLegend");
+  const deviceLegend = document.getElementById("deviceLegend");
+  const chartTip = document.getElementById("chartTip");
+  const markerTip = document.getElementById("markerTip");
+
+  const countryPie = document.getElementById("countryPie");
+  const providerPie = document.getElementById("providerPie");
+  const countryLegend = document.getElementById("countryLegend");
+  const providerLegend = document.getElementById("providerLegend");
+
+  // ======================================================
+  // UTILS
+  // ======================================================
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+  const norm = v => String(v ?? "").trim().toLowerCase();
+  const contains = (a, b) => norm(a).includes(norm(b));
+  const uniqSorted = (arr) => Array.from(new Set(arr.filter(Boolean))).sort((a,b)=>String(a).localeCompare(String(b)));
+  function setOptions(selectEl, values, placeholder) {
+    selectEl.innerHTML = "";
+    selectEl.appendChild(new Option(placeholder, ""));
+    for (const v of values) selectEl.appendChild(new Option(v, v));
+  }
+  function debounce(fn, ms) {
+    let t = null;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function parseTimestamp(v) {
+    const t = Date.parse(String(v || ""));
+    return Number.isFinite(t) ? t : Date.now();
+  }
+  function asNum(v, fallback = 0) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+  function mapApiRowToMarker(row, idx) {
+    return {
+      id: asNum(row["event id"], idx + 1),
+      lon: asNum(row["long"], 0),
+      lat: asNum(row.lat, 0),
+      poc: String(row.poc || ""),
+      equipment: String(row.equipment || ""),
+      collection: String(row.collectionName || ""),
+      imsi: String(row.imsi || ""),
+      imei: String(row.imei || ""),
+      country: String(row.providerCountry || "Unknown"),
+      provider: String(row.provider || "Unknown"),
+      createdAt: parseTimestamp(row["date_time collected"])
+    };
+  }
+  async function loadMarkersFromApi(options = {}) {
+    const fallbackOnError = options.fallbackOnError !== false;
+    try {
+      const res = await fetch("/api/sample-data?limit=2000", { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const payload = await res.json();
+      const rows = Array.isArray(payload.rows) ? payload.rows : [];
+      if (!rows.length) throw new Error("No rows returned");
+      allMarkers = rows.map(mapApiRowToMarker);
+      statusEl.textContent = `Loaded ${allMarkers.length} rows from API`;
+      return true;
+    } catch (err) {
+      if (fallbackOnError) {
+        allMarkers = [...fallbackMarkers];
+        statusEl.textContent = `API unavailable. Using fallback sample data (${allMarkers.length}).`;
+      } else {
+        statusEl.textContent = `API refresh failed. Keeping current data (${allMarkers.length}).`;
+      }
+      console.warn("API load failed, using fallback markers:", err);
+      return false;
+    }
+  }
+
+  function restoreSelectValue(selectEl, value) {
+    if (!value) {
+      selectEl.value = "";
+      return;
+    }
+    const exists = Array.from(selectEl.options).some(o => o.value === value);
+    selectEl.value = exists ? value : "";
+  }
+
+  let refreshInFlight = false;
+  async function refreshData(reason = "manual") {
+    if (refreshInFlight) return;
+    refreshInFlight = true;
+
+    const prev = {
+      poc: pocSelect.value,
+      equip: equipSelect.value,
+      collection: collectionSelect.value,
+      start: startTime,
+      end: endTime
+    };
+
+    if (reason === "manual") statusEl.textContent = "Refreshing data from API...";
+
+    try {
+      const ok = await loadMarkersFromApi({ fallbackOnError: false });
+      if (!ok) return;
+
+      rebuildDropdowns();
+      restoreSelectValue(pocSelect, prev.poc);
+      restoreSelectValue(equipSelect, prev.equip);
+      restoreSelectValue(collectionSelect, prev.collection);
+
+      initTimelineFromMarkers();
+      const minT = Number(timeStart.min);
+      const maxT = Number(timeStart.max);
+      startTime = clamp(prev.start, minT, maxT);
+      endTime = clamp(prev.end, minT, maxT);
+      if (startTime > endTime) {
+        startTime = minT;
+        endTime = maxT;
+      }
+      timeStart.value = String(startTime);
+      timeEnd.value = String(endTime);
+      syncTimeRange();
+
+      computeFilteredSets(true);
+      redraw();
+    } finally {
+      refreshInFlight = false;
+    }
+  }
+
+  // ======================================================
+  // MAP STATE
+  // ======================================================
+  const view = { lon: 0, lat: 0, res: 360 / CFG.VIEW_W };
+  function clampLat(v) { return clamp(v, -89.9999, 89.9999); }
+  function wrapLon(lon) { return ((lon + 180) % 360 + 360) % 360 - 180; }
+  function clampRes(r) { return clamp(r, CFG.MIN_RES, CFG.MAX_RES); }
+
+  function viewBbox() {
+    const hw = (CFG.VIEW_W * view.res) / 2;
+    const hh = (CFG.VIEW_H * view.res) / 2;
+    return {
+      minLon: view.lon - hw,
+      maxLon: view.lon + hw,
+      minLat: clampLat(view.lat - hh),
+      maxLat: clampLat(view.lat + hh),
+    };
+  }
+
+  function lonLatToScreen(lon, lat) {
+    const vb = viewBbox();
+    const vbCenter = (vb.minLon + vb.maxLon) / 2;
+
+    let lonAdj = lon;
+    while (lonAdj - vbCenter > 180) lonAdj -= 360;
+    while (vbCenter - lonAdj > 180) lonAdj += 360;
+
+    const x = ((lonAdj - vb.minLon) / (vb.maxLon - vb.minLon)) * CFG.VIEW_W;
+    const y = ((vb.maxLat - lat) / (vb.maxLat - vb.minLat)) * CFG.VIEW_H;
+    return { x, y };
+  }
+
+  function screenToLonLat(px, py) {
+    const vb = viewBbox();
+    const lon = vb.minLon + (px / CFG.VIEW_W) * (vb.maxLon - vb.minLon);
+    const lat = vb.maxLat - (py / CFG.VIEW_H) * (vb.maxLat - vb.minLat);
+    return { lon: wrapLon(lon), lat };
+  }
+
+  // ======================================================
+  // FILTER / SELECTION STATE
+  // ======================================================
+  let startTime = Date.now();
+  let endTime   = Date.now();
+  let lastTimeChanged = "end";
+  const selected = new Set();
+
+  let chartFilter = null; // {type:"imsi5"|"tac"|"country"|"provider", value:string} or null
+  let hoverFilter = null;
+  let markerFilterId = null;
+  let lassoFilterIds = null; // Set<number> | null
+  let hoveredMarkerId = null;
+
+  let baseFiltered = [];
+  let filteredAll = [];
+  let filteredInView = [];
+
+  function getSearchField() {
+    const r = searchFieldRadios.find(x => x.checked);
+    return r ? r.value : "imsi";
+  }
+
+  function getFilters() {
+    return {
+      poc: pocSelect.value || null,
+      equipment: equipSelect.value || null,
+      collection: collectionSelect.value || null,
+      searchField: getSearchField(),
+      searchText: searchText.value.trim() || null,
+    };
+  }
+
+  function markerMatchesChartFilter(m, f) {
+    if (!f) return true;
+
+    if (f.type === "imsi5") {
+      const s = String(m.imsi || "").replace(/\D/g, "");
+      const p5 = s.length >= 5 ? s.slice(0,5) : (s || "Unknown");
+      return p5 === f.value;
+    }
+    if (f.type === "tac") {
+      const s = String(m.imei || "").replace(/\D/g, "");
+      const tac = s.length >= 8 ? s.slice(0,8) : null;
+      return tac === f.value;
+    }
+    if (f.type === "country") return String(m.country || "") === f.value;
+    if (f.type === "provider") return String(m.provider || "") === f.value;
+    return true;
+  }
+  function markerMatchesMarkerFilter(m) {
+    if (markerFilterId == null) return true;
+    return m.id === markerFilterId;
+  }
+  function markerMatchesLassoFilter(m) {
+    if (!lassoFilterIds) return true;
+    return lassoFilterIds.has(m.id);
+  }
+  function applySlicersAndTimeOnly(markers, f) {
+    return markers.filter(m => {
+      if (m.createdAt < startTime || m.createdAt > endTime) return false;
+
+      if (f.poc && m.poc !== f.poc) return false;
+      if (f.equipment && m.equipment !== f.equipment) return false;
+      if (f.collection && m.collection !== f.collection) return false;
+
+      if (f.searchText) {
+        const field = f.searchField;
+        if (!contains(m[field], f.searchText)) return false;
+      }
+      return true;
+    });
+  }
+
+  function computeFilteredSets(updateTable=true) {
+    const f = getFilters();
+
+    baseFiltered = applySlicersAndTimeOnly(allMarkers, f);
+    if (markerFilterId != null && !baseFiltered.some(m => m.id === markerFilterId)) markerFilterId = null;
+    if (lassoFilterIds) {
+      const lassoInBase = new Set(baseFiltered.filter(m => lassoFilterIds.has(m.id)).map(m => m.id));
+      lassoFilterIds = lassoInBase.size ? lassoInBase : null;
+    }
+    filteredAll = baseFiltered.filter(m =>
+      markerMatchesChartFilter(m, chartFilter) &&
+      markerMatchesMarkerFilter(m) &&
+      markerMatchesLassoFilter(m)
+    );
+
+    const vb = viewBbox();
+    const vbCenter = (vb.minLon + vb.maxLon) / 2;
+
+    filteredInView = filteredAll.filter(m => {
+      let lonAdj = m.lon;
+      while (lonAdj - vbCenter > 180) lonAdj -= 360;
+      while (vbCenter - lonAdj > 180) lonAdj += 360;
+      return (lonAdj >= vb.minLon && lonAdj <= vb.maxLon && m.lat >= vb.minLat && m.lat <= vb.maxLat);
+    });
+
+    const allowed = new Set(filteredAll.map(m => m.id));
+    for (const id of Array.from(selected)) if (!allowed.has(id)) selected.delete(id);
+
+    updatePills(f);
+    if (updateTable) renderTable();
+    updateCharts();
+  }
+
+  function updatePills(f) {
+    countPill.textContent = `${filteredInView.length} visible`;
+    matchPill.textContent = `${filteredAll.length} match filters`;
+    selPill.textContent = `Selected: ${selected.size}`;
+
+    const parts = [];
+    if (f.poc) parts.push(`POC=${f.poc}`);
+    if (f.equipment) parts.push(`Equip=${f.equipment}`);
+    if (f.collection) parts.push(`Collection=${f.collection}`);
+    if (f.searchText) parts.push(`${f.searchField}~${f.searchText}`);
+    if (markerFilterId != null) parts.push(`Marker=${markerFilterId}`);
+    if (lassoFilterIds) parts.push(`Lasso=${lassoFilterIds.size}`);
+    filterPill.textContent = parts.length ? `Filters: ${parts.join(", ")}` : "Filters: —";
+  }
+
+  // ======================================================
+  // TABLE
+  // ======================================================
+  function renderTable() {
+    rowsEl.innerHTML = "";
+    for (const m of filteredInView) {
+      const tr = document.createElement("tr");
+      if (selected.has(m.id)) tr.classList.add("selected");
+      if (hoverFilter && markerMatchesChartFilter(m, hoverFilter)) tr.classList.add("hoverMatch");
+
+      tr.innerHTML = `
+        <td>${escapeHtml(m.imsi)}</td>
+        <td>${escapeHtml(m.imei)}</td>
+        <td>${escapeHtml(m.country)}</td>
+        <td>${escapeHtml(m.provider)}</td>
+        <td>${new Date(m.createdAt).toLocaleString()}</td>
+        <td>${m.lon.toFixed(4)}</td>
+        <td>${m.lat.toFixed(4)}</td>
+      `;
+
+      tr.addEventListener("click", () => {
+        if (selected.has(m.id)) selected.delete(m.id);
+        else selected.add(m.id);
+        selPill.textContent = `Selected: ${selected.size}`;
+        redraw();
+        renderTable();
+      });
+
+      rowsEl.appendChild(tr);
+    }
+  }
+
+  // ======================================================
+  // LASSO SELECTION
+  // ======================================================
+  let lassoActive = false;
+  let lassoPts = [];
+
+  function pointInPolygon(pt, poly) {
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const xi = poly[i].x, yi = poly[i].y;
+      const xj = poly[j].x, yj = poly[j].y;
+      const intersect = ((yi > pt.y) !== (yj > pt.y)) &&
+        (pt.x < (xj - xi) * (pt.y - yi) / ((yj - yi) || 1e-12) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  function applyLassoSelection() {
+    if (lassoPts.length < 3) return;
+    const nextLassoIds = new Set();
+    for (const m of filteredInView) {
+      const p = lonLatToScreen(m.lon, m.lat);
+      if (pointInPolygon(p, lassoPts)) nextLassoIds.add(m.id);
+    }
+    lassoFilterIds = nextLassoIds;
+    selected.clear();
+    for (const id of nextLassoIds) selected.add(id);
+    selPill.textContent = `Selected: ${selected.size}`;
+  }
+
+  function drawLassoOverlay() {
+    if (!lassoActive || lassoPts.length < 2) return;
+    ctx.save();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(0, 90, 255, 0.9)";
+    ctx.fillStyle = "rgba(0, 90, 255, 0.12)";
+    ctx.beginPath();
+    ctx.moveTo(lassoPts[0].x, lassoPts[0].y);
+    for (let i = 1; i < lassoPts.length; i++) ctx.lineTo(lassoPts[i].x, lassoPts[i].y);
+    ctx.stroke();
+    if (lassoPts.length >= 3) { ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+  }
+
+  // ======================================================
+  // WMS: WRAP + STITCH
+  // ======================================================
+  let tiles = [];
+  let fetchTimer = null;
+  let lastFetchAt = 0;
+  let inFlight = false;
+  let pendingFetchReason = null;
+
+  function clampLonSpan(span) { return Math.min(360, Math.max(1e-9, span)); }
+  function clampLatSpan(span) { return Math.min(180, Math.max(1e-9, span)); }
+
+  function buildWmsUrl(bbox, width, height) {
+    const p = new URLSearchParams();
+    p.set("service", "WMS");
+    p.set("request", "GetMap");
+    p.set("version", CFG.WMS_VERSION);
+    p.set("layers", CFG.LAYERS);
+    p.set("styles", "");
+    p.set("format", CFG.FORMAT);
+    p.set("width", String(width));
+    p.set("height", String(height));
+    p.set("crs", CFG.CRS);
+
+    if (CFG.AXIS_ORDER === "latlon") {
+      p.set("bbox", `${bbox.minLat},${bbox.minLon},${bbox.maxLat},${bbox.maxLon}`);
+    } else {
+      p.set("bbox", `${bbox.minLon},${bbox.minLat},${bbox.maxLon},${bbox.maxLat}`);
+    }
+    return `${CFG.WMS_BASE_URL}?${p.toString()}`;
+  }
+
+  function splitLonRangeForRequest(unMinLon, unMaxLon) {
+    if (unMinLon >= -180 && unMaxLon <= 180) {
+      return [{ reqMinLon: unMinLon, reqMaxLon: unMaxLon, unMinLon, unMaxLon }];
+    }
+    if (unMaxLon > 180) {
+      return [
+        { reqMinLon: unMinLon, reqMaxLon: 180,            unMinLon: unMinLon, unMaxLon: 180 },
+        { reqMinLon: -180,     reqMaxLon: unMaxLon - 360, unMinLon: 180,      unMaxLon: unMaxLon },
+      ];
+    }
+    if (unMinLon < -180) {
+      return [
+        { reqMinLon: -180,           reqMaxLon: unMaxLon, unMinLon: -180,     unMaxLon: unMaxLon },
+        { reqMinLon: unMinLon + 360, reqMaxLon: 180,      unMinLon: unMinLon, unMaxLon: -180 },
+      ];
+    }
+    return [{ reqMinLon: Math.max(-180, unMinLon), reqMaxLon: Math.min(180, unMaxLon), unMinLon, unMaxLon }];
+  }
+
+  function computeBufferTarget() {
+    const vb = viewBbox();
+    const vLonSpan = clampLonSpan(vb.maxLon - vb.minLon);
+    const vLatSpan = clampLatSpan(vb.maxLat - vb.minLat);
+
+    const bLonSpan = clampLonSpan(vLonSpan * CFG.BUFFER_COVERAGE);
+    const bLatSpan = clampLatSpan(vLatSpan * CFG.BUFFER_COVERAGE);
+
+    const midLon = (vb.minLon + vb.maxLon) / 2;
+    const midLat = (vb.minLat + vb.maxLat) / 2;
+
+    const unMinLon = midLon - bLonSpan / 2;
+    const unMaxLon = midLon + bLonSpan / 2;
+    const unMinLat = clampLat(midLat - bLatSpan / 2);
+    const unMaxLat = clampLat(midLat + bLatSpan / 2);
+
+    return { unMinLon, unMaxLon, unMinLat, unMaxLat };
+  }
+
+  function loadImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Image load failed"));
+      img.src = url;
+    });
+  }
+
+  function drawPlaceholder(msg) {
+    ctx.clearRect(0,0,CFG.VIEW_W,CFG.VIEW_H);
+    ctx.fillStyle = "#eee";
+    ctx.fillRect(0,0,CFG.VIEW_W,CFG.VIEW_H);
+    ctx.fillStyle = "#333";
+    ctx.font = "16px system-ui";
+    ctx.fillText(msg, 18, 28);
+  }
+
+  function scheduleFetch(reason) {
+    if (fetchTimer) clearTimeout(fetchTimer);
+    pendingFetchReason = reason;
+    fetchTimer = setTimeout(() => tryFetch(pendingFetchReason || "debounced"), CFG.FETCH_DEBOUNCE_MS);
+  }
+
+  function tryFetch(reason) {
+    const now = Date.now();
+    const since = now - lastFetchAt;
+
+    if (inFlight) { pendingFetchReason = reason; return; }
+    if (since < CFG.MIN_CALL_INTERVAL_MS) {
+      const wait = CFG.MIN_CALL_INTERVAL_MS - since;
+      if (fetchTimer) clearTimeout(fetchTimer);
+      fetchTimer = setTimeout(() => tryFetch(reason + "+throttled"), wait);
+      return;
+    }
+    doFetch(reason);
+  }
+
+  async function doFetch(reason) {
+    inFlight = true;
+    lastFetchAt = Date.now();
+
+    const buf = computeBufferTarget();
+    const segs = splitLonRangeForRequest(buf.unMinLon, buf.unMaxLon);
+    const totalLon = Math.max(1e-9, buf.unMaxLon - buf.unMinLon);
+
+    const reqs = segs.map(seg => {
+      const segLon = Math.max(1e-9, seg.unMaxLon - seg.unMinLon);
+      const w = Math.max(96, Math.round(CFG.BUF_W * (segLon / totalLon)));
+      const h = CFG.BUF_H;
+
+      const reqBbox = { minLon: seg.reqMinLon, maxLon: seg.reqMaxLon, minLat: buf.unMinLat, maxLat: buf.unMaxLat };
+      const url = buildWmsUrl(reqBbox, w, h) + `&_ts=${Date.now()}`;
+      return { url, w, h, seg, buf };
+    });
+
+    console.log("[WMS] fetch", reason, reqs.map(r => r.url));
+    statusEl.textContent = `Fetching WMS (${reason})… ${reqs.length} tile(s)`;
+
+    try {
+      const imgs = await Promise.all(reqs.map(r => loadImage(r.url)));
+      tiles = reqs.map((r, i) => ({
+        img: imgs[i],
+        w: r.w,
+        h: r.h,
+        unMinLon: r.seg.unMinLon,
+        unMaxLon: r.seg.unMaxLon,
+        unMinLat: r.buf.unMinLat,
+        unMaxLat: r.buf.unMaxLat,
+      }));
+
+      inFlight = false;
+      redraw();
+
+      statusEl.textContent =
+        `OK | center=(${view.lon.toFixed(3)}, ${view.lat.toFixed(3)}) res=${view.res.toFixed(6)}°/px | tiles=${tiles.length}`;
+
+      if (pendingFetchReason) {
+        const r = pendingFetchReason;
+        pendingFetchReason = null;
+        tryFetch(r + "+post");
+      }
+    } catch (err) {
+      inFlight = false;
+      console.warn("[WMS] FAILED", err);
+      statusEl.textContent = "WMS fetch failed (see console). Keeping last image.";
+      redraw();
+    }
+  }
+
+  function drawFromTiles() {
+    if (!tiles.length) { drawPlaceholder("Fetching initial WMS…"); return; }
+
+    const vb = viewBbox();
+    const vbW = vb.maxLon - vb.minLon;
+    const vbH = vb.maxLat - vb.minLat;
+
+    ctx.clearRect(0,0,CFG.VIEW_W,CFG.VIEW_H);
+
+    for (const t of tiles) {
+      const iMinLon = Math.max(vb.minLon, t.unMinLon);
+      const iMaxLon = Math.min(vb.maxLon, t.unMaxLon);
+      if (iMaxLon <= iMinLon) continue;
+
+      const iMinLat = Math.max(vb.minLat, t.unMinLat);
+      const iMaxLat = Math.min(vb.maxLat, t.unMaxLat);
+      if (iMaxLat <= iMinLat) continue;
+
+      const dx = ((iMinLon - vb.minLon) / vbW) * CFG.VIEW_W;
+      const dw = ((iMaxLon - iMinLon) / vbW) * CFG.VIEW_W;
+
+      const dy = ((vb.maxLat - iMaxLat) / vbH) * CFG.VIEW_H;
+      const dh = ((iMaxLat - iMinLat) / vbH) * CFG.VIEW_H;
+
+      const tLonSpan = t.unMaxLon - t.unMinLon;
+      const tLatSpan = t.unMaxLat - t.unMinLat;
+
+      const sx = ((iMinLon - t.unMinLon) / tLonSpan) * t.w;
+      const sw = ((iMaxLon - iMinLon) / tLonSpan) * t.w;
+
+      const sy = ((t.unMaxLat - iMaxLat) / tLatSpan) * t.h;
+      const sh = ((iMaxLat - iMinLat) / tLatSpan) * t.h;
+
+      ctx.drawImage(t.img, sx, sy, sw, sh, dx, dy, dw, dh);
+    }
+  }
+
+  // ======================================================
+  // MARKER DRAW
+  // ======================================================
+  function drawMarkers() {
+    for (const m of filteredInView) {
+      const p = lonLatToScreen(m.lon, m.lat);
+      const hoverMatch = hoverFilter && markerMatchesChartFilter(m, hoverFilter);
+      const isMarkerFilter = markerFilterId != null && m.id === markerFilterId;
+      const isHoveredMarker = hoveredMarkerId != null && m.id === hoveredMarkerId;
+      drawOne(p.x, p.y, selected.has(m.id), hoverMatch, isMarkerFilter, isHoveredMarker);
+
+      const pxPer360 = 360 / view.res;
+      if (p.x < CFG.EDGE_DUP_PX) drawOne(p.x + pxPer360, p.y, selected.has(m.id), hoverMatch, isMarkerFilter, isHoveredMarker);
+      if (p.x > CFG.VIEW_W - CFG.EDGE_DUP_PX) drawOne(p.x - pxPer360, p.y, selected.has(m.id), hoverMatch, isMarkerFilter, isHoveredMarker);
+    }
+
+    function drawOne(x, y, isSel, hoverMatch, isMarkerFilter, isHoveredMarker) {
+      if (x < -50 || x > CFG.VIEW_W + 50 || y < -50 || y > CFG.VIEW_H + 50) return;
+
+      if (isMarkerFilter || isHoveredMarker) {
+        ctx.beginPath();
+        ctx.arc(x, y, 14, 0, Math.PI*2);
+        ctx.strokeStyle = isMarkerFilter ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.45)";
+        ctx.lineWidth = isMarkerFilter ? 3 : 2;
+        ctx.stroke();
+      }
+
+      if (hoverMatch) {
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, Math.PI*2);
+        ctx.strokeStyle = "rgba(0, 90, 255, 0.9)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+
+      if (isSel) {
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, Math.PI*2);
+        ctx.fillStyle = "rgba(255, 215, 0, 0.55)";
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI*2);
+      ctx.fillStyle = isSel ? "rgba(0, 140, 40, 0.95)" : "rgba(220, 0, 0, 0.95)";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "white";
+      ctx.stroke();
+    }
+  }
+
+  function showMarkerTip(evt, marker) {
+    markerTip.style.display = "block";
+    markerTip.innerHTML = `
+      <div><b>${escapeHtml(new Date(marker.createdAt).toLocaleString())}</b></div>
+      <div>IMSI: ${escapeHtml(marker.imsi || "Unknown")}</div>
+      <div>IMEI: ${escapeHtml(marker.imei || "Unknown")}</div>
+      <div>Country: ${escapeHtml(marker.country || "Unknown")}</div>
+      <div>Provider: ${escapeHtml(marker.provider || "Unknown")}</div>
+    `;
+    markerTip.style.left = (evt.clientX + 12) + "px";
+    markerTip.style.top  = (evt.clientY + 12) + "px";
+  }
+
+  function hideMarkerTip() { markerTip.style.display = "none"; }
+
+  function findMarkerAtCanvasPoint(px, py) {
+    const HIT_R = 9;
+    let best = null;
+    let bestDist = Infinity;
+
+    for (const m of filteredInView) {
+      const p = lonLatToScreen(m.lon, m.lat);
+      const pts = [{ x: p.x, y: p.y }];
+      const pxPer360 = 360 / view.res;
+      if (p.x < CFG.EDGE_DUP_PX) pts.push({ x: p.x + pxPer360, y: p.y });
+      if (p.x > CFG.VIEW_W - CFG.EDGE_DUP_PX) pts.push({ x: p.x - pxPer360, y: p.y });
+
+      for (const q of pts) {
+        const d = Math.hypot(px - q.x, py - q.y);
+        if (d <= HIT_R && d < bestDist) {
+          bestDist = d;
+          best = m;
+        }
+      }
+    }
+    return best;
+  }
+
+  function redraw() {
+    drawFromTiles();
+    drawMarkers();
+    drawLassoOverlay();
+  }
+
+  // ======================================================
+  // CHARTS
+  // ======================================================
+  let hoverImsiLabel = null;
+  let hoverDeviceLabel = null;
+  let hoverCountryLabel = null;
+  let hoverProviderLabel = null;
+
+  function getImsiPrefix5(imsi) {
+    const s = String(imsi || "").replace(/\D/g, "");
+    return s.length >= 5 ? s.slice(0, 5) : (s ? s : "Unknown");
+  }
+  function getTacFromImei(imei) {
+    const s = String(imei || "").replace(/\D/g, "");
+    return s.length >= 8 ? s.slice(0, 8) : null;
+  }
+  function getDeviceLabelFromImei(imei) {
+    const tac = getTacFromImei(imei);
+    if (!tac) return "Unknown";
+    return TAC_MAP[tac] || `TAC ${tac}`;
+  }
+  function hashToHue(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return h % 360;
+  }
+  function normAngle(a) {
+    const TAU = Math.PI * 2;
+    a = a % TAU;
+    if (a < 0) a += TAU;
+    return a;
+  }
+  function mouseToCanvasXY(canvas, evt) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return { x: (evt.clientX - rect.left) * scaleX, y: (evt.clientY - rect.top) * scaleY };
+  }
+
+  function showTip(evt, html) {
+    chartTip.style.display = "block";
+    chartTip.innerHTML = html;
+    chartTip.style.left = (evt.clientX + 12) + "px";
+    chartTip.style.top  = (evt.clientY + 12) + "px";
+  }
+  function hideTip() { chartTip.style.display = "none"; }
+
+  function drawPieChart(canvas, legendEl, counts, opts = {}) {
+    const c2 = canvas.getContext("2d");
+    const W = canvas.width, H = canvas.height;
+    c2.clearRect(0, 0, W, H);
+
+    const selectedLabel = opts.selectedLabel || null;
+    const hoverLabel = opts.hoverLabel || null;
+
+    const entries = Object.entries(counts)
+      .map(([k, v]) => [k, Number(v) || 0])
+      .filter(([, v]) => v > 0)
+      .sort((a, b) => b[1] - a[1]);
+
+    const total = entries.reduce((s, [, v]) => s + v, 0);
+    canvas._slices = [];
+
+    if (!total) {
+      c2.font = "14px system-ui";
+      c2.fillStyle = "#333";
+      c2.fillText("No data", 12, 22);
+      legendEl.innerHTML = "";
+      return;
+    }
+
+    const maxSlices = opts.maxSlices ?? 10;
+    let shown = entries;
+    if (entries.length > maxSlices) {
+      const head = entries.slice(0, maxSlices - 1);
+      const tail = entries.slice(maxSlices - 1);
+      const otherSum = tail.reduce((s, [, v]) => s + v, 0);
+      shown = head.concat([["Other", otherSum]]);
+    }
+
+    const cx = Math.round(W * 0.5);
+    const cy = Math.round(H * 0.55);
+    const r = Math.min(W, H) * 0.38;
+    const innerR = r * 0.56;
+
+    const TAU = Math.PI * 2;
+    let angle = normAngle(-Math.PI / 2);
+
+    function ringSlicePath(start, end) {
+      c2.beginPath();
+      if (end >= start) {
+        c2.arc(cx, cy, r, start, end);
+        c2.arc(cx, cy, innerR, end, start, true);
+      } else {
+        c2.arc(cx, cy, r, start, TAU);
+        c2.arc(cx, cy, r, 0, end);
+        c2.arc(cx, cy, innerR, end, 0, true);
+        c2.arc(cx, cy, innerR, TAU, start, true);
+      }
+      c2.closePath();
+    }
+
+    for (const [label, val] of shown) {
+      const frac = val / total;
+      const a2 = normAngle(angle + frac * TAU);
+
+      ringSlicePath(angle, a2);
+
+      const hue = hashToHue(label);
+      c2.fillStyle = `hsl(${hue} 70% 55%)`;
+      c2.fill();
+      c2.lineWidth = 2;
+      c2.strokeStyle = "rgba(255,255,255,0.9)";
+      c2.stroke();
+
+      const isSel = selectedLabel && label === selectedLabel;
+      const isHover = hoverLabel && label === hoverLabel;
+      if (isSel || isHover) {
+        c2.save();
+        ringSlicePath(angle, a2);
+        c2.lineWidth = isSel ? 5 : 3;
+        c2.strokeStyle = isSel ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.45)";
+        c2.stroke();
+        c2.restore();
+      }
+
+      canvas._slices.push({ label, start: angle, end: a2, cx, cy, r, innerR, val, total });
+      angle = a2;
+    }
+
+    c2.save();
+    c2.beginPath();
+    c2.arc(cx, cy, innerR, 0, TAU);
+    c2.fillStyle = "#fff";
+    c2.fill();
+    c2.lineWidth = 1.5;
+    c2.strokeStyle = "rgba(0,0,0,0.12)";
+    c2.stroke();
+    c2.fillStyle = "#6b7280";
+    c2.font = "600 12px system-ui";
+    c2.textAlign = "center";
+    c2.textBaseline = "middle";
+    c2.fillText("Total", cx, cy - 9);
+    c2.fillStyle = "#111827";
+    c2.font = "700 20px system-ui";
+    c2.fillText(String(total), cx, cy + 11);
+    c2.restore();
+
+    legendEl.innerHTML = shown.map(([label, val]) => {
+      const pct = ((val / total) * 100).toFixed(1);
+      const hue = hashToHue(label);
+      return `
+        <div style="display:flex;align-items:center;gap:8px;margin:2px 0;">
+          <span style="width:10px;height:10px;border-radius:2px;background:hsl(${hue} 70% 55%);display:inline-block;"></span>
+          <span>${escapeHtml(label)}</span>
+          <span style="margin-left:auto;opacity:0.75;">${val} (${pct}%)</span>
+        </div>`;
+    }).join("");
+  }
+
+  function pieHitTest(canvas, evt) {
+    const { x, y } = mouseToCanvasXY(canvas, evt);
+    const slices = canvas._slices || [];
+    const TAU = Math.PI * 2;
+
+    for (const s of slices) {
+      const dx = x - s.cx;
+      const dy = y - s.cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist > s.r || dist < s.innerR) continue;
+
+      const a = normAngle(Math.atan2(dy, dx));
+      const start = s.start, end = s.end;
+
+      if (end >= start) {
+        if (a >= start && a <= end) return s;
+      } else {
+        if (a >= start && a <= TAU) return s;
+        if (a >= 0 && a <= end) return s;
+      }
+    }
+    return null;
+  }
+
+  function updateCharts() {
+
+    function buildCounts(source) {
+      const imsiCounts = {};
+      const deviceCounts = {};
+      const countryCounts = {};
+      const providerCounts = {};
+
+      for (const m of source) {
+        const p5 = getImsiPrefix5(m.imsi);
+        imsiCounts[p5] = (imsiCounts[p5] || 0) + 1;
+
+        const dev = getDeviceLabelFromImei(m.imei);
+        deviceCounts[dev] = (deviceCounts[dev] || 0) + 1;
+
+        const c = String(m.country || "Unknown");
+        countryCounts[c] = (countryCounts[c] || 0) + 1;
+
+        const p = String(m.provider || "Unknown");
+        providerCounts[p] = (providerCounts[p] || 0) + 1;
+      }
+
+      return { imsiCounts, deviceCounts, countryCounts, providerCounts };
+    }
+
+    // If a chart is selected, filter the other charts by that selection.
+    const allCounts = buildCounts(baseFiltered);
+    const filteredCounts = buildCounts(filteredAll);
+
+    const imsiSourceCounts = (chartFilter?.type === "imsi5") ? allCounts.imsiCounts : filteredCounts.imsiCounts;
+    const deviceSourceCounts = (chartFilter?.type === "tac") ? allCounts.deviceCounts : filteredCounts.deviceCounts;
+    const countrySourceCounts = (chartFilter?.type === "country") ? allCounts.countryCounts : filteredCounts.countryCounts;
+    const providerSourceCounts = (chartFilter?.type === "provider") ? allCounts.providerCounts : filteredCounts.providerCounts;
+
+    drawPieChart(imsiPie, imsiLegend, imsiSourceCounts, {
+      maxSlices: 10,
+      selectedLabel: (chartFilter?.type === "imsi5") ? chartFilter.value : null,
+      hoverLabel: hoverImsiLabel
+    });
+
+    drawPieChart(devicePie, deviceLegend, deviceSourceCounts, {
+      maxSlices: 10,
+      selectedLabel: (chartFilter?.type === "tac") ? `TAC ${chartFilter.value}` : null,
+      hoverLabel: hoverDeviceLabel
+    });
+
+    drawPieChart(countryPie, countryLegend, countrySourceCounts, {
+      maxSlices: 10,
+      selectedLabel: (chartFilter?.type === "country") ? chartFilter.value : null,
+      hoverLabel: hoverCountryLabel
+    });
+
+    drawPieChart(providerPie, providerLegend, providerSourceCounts, {
+      maxSlices: 10,
+      selectedLabel: (chartFilter?.type === "provider") ? chartFilter.value : null,
+      hoverLabel: hoverProviderLabel
+    });
+  }
+
+  function toggleChartFilter(next) {
+    if (chartFilter && chartFilter.type === next.type && chartFilter.value === next.value) chartFilter = null;
+    else chartFilter = next;
+
+    computeFilteredSets(true);
+    redraw();
+  }
+
+  // Click handlers
+  imsiPie.addEventListener("click", (e) => {
+    const s = pieHitTest(imsiPie, e);
+    if (!s || s.label === "Other") return;
+    toggleChartFilter({ type: "imsi5", value: s.label });
+  });
+
+  devicePie.addEventListener("click", (e) => {
+    const s = pieHitTest(devicePie, e);
+    if (!s || s.label === "Other") return;
+    if (!String(s.label).startsWith("TAC ")) return;
+    toggleChartFilter({ type: "tac", value: String(s.label).slice(4) });
+  });
+
+  countryPie.addEventListener("click", (e) => {
+    const s = pieHitTest(countryPie, e);
+    if (!s || s.label === "Other") return;
+    toggleChartFilter({ type: "country", value: s.label });
+  });
+
+  providerPie.addEventListener("click", (e) => {
+    const s = pieHitTest(providerPie, e);
+    if (!s || s.label === "Other") return;
+    toggleChartFilter({ type: "provider", value: s.label });
+  });
+
+  // Hover handlers (tooltip + cross-highlight)
+  function wireHover(canvasEl, setHoverLabel, getHoverLabel, filterObjBuilder, title) {
+    canvasEl.addEventListener("mousemove", (e) => {
+      const s = pieHitTest(canvasEl, e);
+      if (!s || s.label === "Other") {
+        setHoverLabel(null);
+        hideTip();
+        hoverFilter = null;
+        renderTable();
+        updateCharts();
+        canvasEl.style.cursor = "default";
+        redraw();
+        return;
+      }
+
+      setHoverLabel(s.label);
+      const pct = ((s.val / s.total) * 100).toFixed(1);
+      showTip(e, `<b>${escapeHtml(title)}</b>: ${escapeHtml(s.label)}<br>${s.val} (${pct}%)`);
+
+      hoverFilter = filterObjBuilder(s.label);
+      renderTable();
+      updateCharts();
+      canvasEl.style.cursor = "pointer";
+      redraw();
+    });
+
+    canvasEl.addEventListener("mouseleave", () => {
+      setHoverLabel(null);
+      hideTip();
+      hoverFilter = null;
+      renderTable();
+      updateCharts();
+      redraw();
+    });
+  }
+
+  wireHover(imsiPie,
+    v => hoverImsiLabel = v,
+    () => hoverImsiLabel,
+    lbl => ({ type:"imsi5", value: lbl }),
+    "IMSI5"
+  );
+
+  wireHover(devicePie,
+    v => hoverDeviceLabel = v,
+    () => hoverDeviceLabel,
+    lbl => (String(lbl).startsWith("TAC ") ? { type:"tac", value: String(lbl).slice(4) } : null),
+    "Device"
+  );
+
+  wireHover(countryPie,
+    v => hoverCountryLabel = v,
+    () => hoverCountryLabel,
+    lbl => ({ type:"country", value: lbl }),
+    "Country"
+  );
+
+  wireHover(providerPie,
+    v => hoverProviderLabel = v,
+    () => hoverProviderLabel,
+    lbl => ({ type:"provider", value: lbl }),
+    "Provider"
+  );
+
+  // ======================================================
+  // TIMELINE INIT + SYNC (FIXED)
+  // ======================================================
+  function initTimelineFromMarkers() {
+    if (!allMarkers.length) {
+      const t = Date.now();
+      timeStart.min = timeEnd.min = String(t);
+      timeStart.max = timeEnd.max = String(t);
+      timeStart.step = timeEnd.step = "1";
+      startTime = endTime = t;
+      timeStart.value = String(startTime);
+      timeEnd.value   = String(endTime);
+      return;
+    }
+
+    let minT = Infinity, maxT = -Infinity;
+    for (const m of allMarkers) { minT = Math.min(minT, m.createdAt); maxT = Math.max(maxT, m.createdAt); }
+
+    const SLIDER_STEPS = 300;
+    const span = Math.max(1, maxT - minT);
+    const step = Math.max(1, Math.round(span / SLIDER_STEPS));
+
+    timeStart.min = timeEnd.min = String(minT);
+    timeStart.max = timeEnd.max = String(maxT);
+    timeStart.step = timeEnd.step = String(step);
+
+    startTime = minT;
+    endTime   = maxT;
+    timeStart.value = String(startTime);
+    timeEnd.value   = String(endTime);
+  }
+
+  function syncTimeRange() {
+    let s = Number(timeStart.value);
+    let e = Number(timeEnd.value);
+
+    if (s > e) {
+      if (lastTimeChanged === "start") s = e;
+      else e = s;
+    }
+
+    startTime = s;
+    endTime = e;
+
+    timeStart.value = String(startTime);
+    timeEnd.value   = String(endTime);
+
+    timeLabel.textContent = `${new Date(startTime).toLocaleString()} → ${new Date(endTime).toLocaleString()}`;
+
+    // fill bar
+    const min = Number(timeStart.min);
+    const max = Number(timeStart.max);
+    const span = Math.max(1, max - min);
+
+    const leftPct = ((startTime - min) / span) * 100;
+    const rightPct = ((endTime - min) / span) * 100;
+
+    timeRangeFill.style.left = `${leftPct}%`;
+    timeRangeFill.style.width = `${Math.max(0, rightPct - leftPct)}%`;
+  }
+
+  // ======================================================
+  // UI INIT (dropdowns)
+  // ======================================================
+  function rebuildDropdowns() {
+    setOptions(pocSelect, uniqSorted(allMarkers.map(m => m.poc)), "All POCs");
+    setOptions(equipSelect, uniqSorted(allMarkers.map(m => m.equipment)), "All Equipment");
+    setOptions(collectionSelect, uniqSorted(allMarkers.map(m => m.collection)), "All Collections");
+  }
+
+  // ======================================================
+  // INTERACTION: pan/zoom/lasso/click-add
+  // ======================================================
+  let mouseDown = false;
+  let didDrag = false;
+  let panning = false;
+  let start = null;
+
+  canvas.addEventListener("mousedown", (e) => {
+    if (e.button !== 0) return;
+    mouseDown = true;
+    didDrag = false;
+    start = { x: e.clientX, y: e.clientY, lon: view.lon, lat: view.lat };
+    hoveredMarkerId = null;
+    hideMarkerTip();
+
+    if (e.shiftKey) {
+      lassoActive = true;
+      lassoPts = [{ x: e.offsetX, y: e.offsetY }];
+      canvas.classList.add("lassoing");
+      redraw();
+      return;
+    }
+
+    panning = true;
+    canvas.classList.add("dragging");
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (!mouseDown || !start) return;
+
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+
+    if (Math.abs(dx) > CFG.DRAG_THRESHOLD_PX || Math.abs(dy) > CFG.DRAG_THRESHOLD_PX) didDrag = true;
+
+    if (lassoActive) {
+      const r = canvas.getBoundingClientRect();
+      lassoPts.push({ x: e.clientX - r.left, y: e.clientY - r.top });
+      redraw();
+      return;
+    }
+
+    if (panning) {
+      view.lon = wrapLon(start.lon - dx * view.res);
+      view.lat = clampLat(start.lat + dy * view.res);
+      computeFilteredSets(false);
+      redraw();
+    }
+  });
+
+  window.addEventListener("mouseup", () => {
+    if (!mouseDown) return;
+    mouseDown = false;
+
+    if (lassoActive) {
+      lassoActive = false;
+      canvas.classList.remove("lassoing");
+      applyLassoSelection();
+      lassoPts = [];
+      computeFilteredSets(true);
+      redraw();
+      return;
+    }
+
+    if (panning) {
+      panning = false;
+      canvas.classList.remove("dragging");
+      computeFilteredSets(true);
+      redraw();
+      if (didDrag) scheduleFetch("pan-end");
+    }
+  });
+
+  canvas.addEventListener("mousemove", (e) => {
+    if (mouseDown || lassoActive || panning) return;
+
+    const hit = findMarkerAtCanvasPoint(e.offsetX, e.offsetY);
+    if (!hit) {
+      if (hoveredMarkerId != null) {
+        hoveredMarkerId = null;
+        redraw();
+      }
+      hideMarkerTip();
+      if (!chartTip || chartTip.style.display === "none") canvas.style.cursor = "default";
+      return;
+    }
+
+    if (hoveredMarkerId !== hit.id) {
+      hoveredMarkerId = hit.id;
+      redraw();
+    }
+    showMarkerTip(e, hit);
+    canvas.style.cursor = "pointer";
+  });
+
+  canvas.addEventListener("mouseleave", () => {
+    if (hoveredMarkerId != null) {
+      hoveredMarkerId = null;
+      redraw();
+    }
+    hideMarkerTip();
+    canvas.style.cursor = "default";
+  });
+
+  canvas.addEventListener("click", (e) => {
+    if (didDrag) return;
+    if (lassoActive) return;
+    if (e.shiftKey) return;
+
+    const clickedMarker = findMarkerAtCanvasPoint(e.offsetX, e.offsetY);
+    if (clickedMarker) {
+      markerFilterId = (markerFilterId === clickedMarker.id) ? null : clickedMarker.id;
+      computeFilteredSets(true);
+      redraw();
+    }
+  });
+
+  canvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const z = 1.25;
+
+    const vb = viewBbox();
+    const lon0 = vb.minLon + (e.offsetX / CFG.VIEW_W) * (vb.maxLon - vb.minLon);
+    const lat0 = vb.maxLat - (e.offsetY / CFG.VIEW_H) * (vb.maxLat - vb.minLat);
+
+    view.res = clampRes((e.deltaY < 0) ? (view.res / z) : (view.res * z));
+
+    const widthDeg = CFG.VIEW_W * view.res;
+    const heightDeg = CFG.VIEW_H * view.res;
+
+    view.lon = wrapLon(lon0 - ((e.offsetX / CFG.VIEW_W) - 0.5) * widthDeg);
+    view.lat = clampLat(lat0 + ((e.offsetY / CFG.VIEW_H) - 0.5) * heightDeg);
+
+    computeFilteredSets(false);
+    redraw();
+    scheduleFetch("zoom-end");
+  }, { passive:false });
+
+  // ======================================================
+  // UI WIRING
+  // ======================================================
+  function onFiltersChanged() {
+    computeFilteredSets(true);
+    redraw();
+  }
+
+  pocSelect.addEventListener("change", onFiltersChanged);
+  equipSelect.addEventListener("change", onFiltersChanged);
+  collectionSelect.addEventListener("change", onFiltersChanged);
+
+  const updateFiltersDebounced = debounce(() => {
+    computeFilteredSets(true);
+    redraw();
+  }, 180);
+
+  searchText.addEventListener("input", updateFiltersDebounced);
+
+  const placeholders = {
+    imsi: "Search IMSI…",
+    imei: "Search IMEI…",
+    country: "Search country…",
+    provider: "Search provider…"
+  };
+
+  searchFieldRadios.forEach(r => {
+    r.addEventListener("change", () => {
+      searchText.value = ""; // auto-clear
+      searchText.placeholder = placeholders[r.value] || "Search…";
+      computeFilteredSets(true);
+      redraw();
+    });
+  });
+
+  resetBtn.addEventListener("click", () => {
+    pocSelect.value = "";
+    equipSelect.value = "";
+    collectionSelect.value = "";
+
+    searchText.value = "";
+    const defaultRadio = document.querySelector('input[name="searchField"][value="imsi"]');
+    if (defaultRadio) defaultRadio.checked = true;
+    searchText.placeholder = placeholders.imsi;
+
+    chartFilter = null;
+    hoverFilter = null;
+    hoverImsiLabel = null;
+    hoverDeviceLabel = null;
+    hoverCountryLabel = null;
+    hoverProviderLabel = null;
+    markerFilterId = null;
+    lassoFilterIds = null;
+    hoveredMarkerId = null;
+    hideTip();
+    hideMarkerTip();
+
+    // reset time range to full extent
+    timeStart.value = timeStart.min;
+    timeEnd.value   = timeEnd.max;
+    lastTimeChanged = "end";
+    syncTimeRange();
+
+    selected.clear();
+    computeFilteredSets(true);
+    redraw();
+  });
+
+  refreshBtn.addEventListener("click", () => {
+    refreshData("manual");
+  });
+
+  timeStart.addEventListener("input", () => {
+    lastTimeChanged = "start";
+    syncTimeRange();
+    computeFilteredSets(true);
+    redraw();
+  });
+
+  timeEnd.addEventListener("input", () => {
+    lastTimeChanged = "end";
+    syncTimeRange();
+    computeFilteredSets(true);
+    redraw();
+  });
+
+  // ======================================================
+  // INIT
+  // ======================================================
+  async function initApp() {
+    await loadMarkersFromApi();
+    rebuildDropdowns();
+    initTimelineFromMarkers();
+    syncTimeRange();
+    computeFilteredSets(true);
+    drawPlaceholder("Fetching initial WMS...");
+    doFetch("init");
+  }
+  initApp();
+
+})();
+</script>
+</body>
+</html>
