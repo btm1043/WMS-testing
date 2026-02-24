@@ -29,6 +29,25 @@
   .chartCard { background:#fff; border:1px solid #eee; border-radius:12px; padding:10px; }
   .chartTitle { font-size:13px; margin-bottom:6px; }
   .legend { font-size:12px; margin-top:6px; max-width:340px; }
+  /*=== 2_24 Edits ===*/
+  .legendItem{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:2px 0;
+    padding:4px 6px;
+    border:1px solid transparent;
+    border-radius:8px;
+    background:#fff;
+    text-align:left;
+    cursor:pointer;
+  }
+  .legendItem:hover{ background:#f7f9ff; border-color:#dbe5ff; }
+  .legendItem:focus-visible{ outline:2px solid #2b6cff; outline-offset:1px; }
+  .legendItem.is-selected{ border-color:#2b6cff; background:#eef3ff; }
+  .legendItem[disabled]{ cursor:default; opacity:0.72; background:#fff; }
+  /*=== End 2_24 Edits ===*/
 
   .chartsPanel canvas, .chartsPanelRight canvas{ width:100%; height:auto; }
 
@@ -55,6 +74,95 @@
   .slicer{ min-width: 160px; }
   .searchSlicer{ flex: 1 1 420px; min-width: 320px; }
   .buttonsSlicer{ min-width: 90px; }
+  /*=== 2_24 Edits ===*/
+  .buttonsSlicer{
+    min-width: 130px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .buttonsSlicer .buttonRow{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .buttonsSlicer .buttonRow label{
+    margin:0;
+    line-height:1;
+    min-height:12px;
+  }
+  /*=== End 2_24 Edits ===*/
+  /*=== 2_24 Edits ===*/
+  .multiSelectStore{ display:none; }
+  .multiDrop{
+    position:relative;
+  }
+  .multiDropBtn{
+    width:100%;
+    min-height:36px;
+    text-align:left;
+    border:1px solid #ccc;
+    border-radius:10px;
+    background:#fff;
+    font-size:13px;
+    padding:8px 34px 8px 10px;
+    line-height:1.35;
+    position:relative;
+  }
+  .multiDropBtn::after{
+    content:"▼";
+    position:absolute;
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:10px;
+    color:#666;
+  }
+  .multiDrop.open .multiDropBtn{
+    border-color:#2b6cff;
+    box-shadow:0 0 0 2px rgba(43,108,255,0.12);
+  }
+  .multiDropMenu{
+    display:none;
+    position:absolute;
+    z-index:50;
+    top:calc(100% + 6px);
+    left:0;
+    right:0;
+    background:#fff;
+    border:1px solid #ddd;
+    border-radius:10px;
+    max-height:260px;
+    overflow:auto;
+    box-shadow:0 8px 22px rgba(0,0,0,0.12);
+    padding:6px;
+  }
+  .multiDrop.open .multiDropMenu{ display:block; }
+  .multiDropItem{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    padding:6px 8px;
+    border-radius:8px;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .multiDropItem:hover{ background:#f7f9ff; }
+  .multiDropItem input{ width:auto; }
+  .multiDropActions{
+    display:flex;
+    gap:6px;
+    padding:4px 6px 8px;
+    border-bottom:1px solid #eee;
+    margin-bottom:4px;
+  }
+  .multiDropActionBtn{
+    width:auto;
+    padding:4px 8px;
+    border-radius:8px;
+    font-size:12px;
+  }
+  /*=== End 2_24 Edits ===*/
 
   /* Search tabs + input in a "boxy" control */
   .searchBox{
@@ -70,7 +178,15 @@
     background: #f4f4f4;
     border-bottom: 1px solid #d8d8d8;
   }
-  .searchTabs input[type="radio"]{ display:none; }
+  /*=== 2_24 Edits ===*/
+  .searchTabs input[type="radio"]{
+    position:absolute;
+    width:1px;
+    height:1px;
+    opacity:0;
+    pointer-events:none;
+  }
+  /*=== End 2_24 Edits ===*/
   .searchTabs label{
     flex: 1;
     text-align:center;
@@ -88,6 +204,12 @@
     box-shadow: inset 0 -2px 0 0 #2b6cff;
     font-weight: 600;
   }
+  /*=== 2_24 Edits ===*/
+  .searchTabs input[type="radio"]:focus-visible + label{
+    outline:2px solid #2b6cff;
+    outline-offset:-2px;
+  }
+  /*=== End 2_24 Edits ===*/
   .searchInput{
     border: none;
     padding: 10px 12px;
@@ -116,6 +238,13 @@
   th { background:#fafafa; position: sticky; top:0; z-index:1; }
   tr.selected { background: rgba(255, 215, 0, 0.22); }
   tr.hoverMatch { outline: 2px solid rgba(0, 90, 255, 0.35); background: rgba(0, 90, 255, 0.06); }
+  /*=== 2_24 Edits ===*/
+  #tableInfo{
+    margin-top:8px;
+    font-size:12px;
+    color:#555;
+  }
+  /*=== End 2_24 Edits ===*/
 
   /* ========== Tooltip ========== */
   #chartTip{
@@ -154,6 +283,22 @@
     gap:10px;
     flex-wrap:wrap;
   }
+  /*=== 2_24 Edits ===*/
+  .timeEditPill{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .timeEditInput{
+    width:auto;
+    min-width:180px;
+    padding:5px 7px;
+    border:1px solid #cfcfcf;
+    border-radius:8px;
+    font-size:12px;
+  }
+  /*=== End 2_24 Edits ===*/
 
   /* Outer container: allow thumbs to stick out at edges */
   .timeRange{
@@ -257,17 +402,35 @@
   <div class="slicerRow">
     <div class="slicer">
       <label for="pocSelect">POC</label>
-      <select id="pocSelect"></select>
+      <!-- /*=== 2_24 Edits ===*/ -->
+      <div id="pocDrop" class="multiDrop">
+        <button id="pocDropBtn" class="multiDropBtn" type="button" aria-haspopup="true" aria-expanded="false">All POCs</button>
+        <div id="pocDropMenu" class="multiDropMenu"></div>
+      </div>
+      <select id="pocSelect" class="multiSelectStore" multiple></select>
+      <!-- /*=== End 2_24 Edits ===*/ -->
     </div>
 
     <div class="slicer">
       <label for="equipSelect">Equipment</label>
-      <select id="equipSelect"></select>
+      <!-- /*=== 2_24 Edits ===*/ -->
+      <div id="equipDrop" class="multiDrop">
+        <button id="equipDropBtn" class="multiDropBtn" type="button" aria-haspopup="true" aria-expanded="false">All Equipment</button>
+        <div id="equipDropMenu" class="multiDropMenu"></div>
+      </div>
+      <select id="equipSelect" class="multiSelectStore" multiple></select>
+      <!-- /*=== End 2_24 Edits ===*/ -->
     </div>
 
     <div class="slicer">
       <label for="collectionSelect">Collection</label>
-      <select id="collectionSelect"></select>
+      <!-- /*=== 2_24 Edits ===*/ -->
+      <div id="collectionDrop" class="multiDrop">
+        <button id="collectionDropBtn" class="multiDropBtn" type="button" aria-haspopup="true" aria-expanded="false">All Collections</button>
+        <div id="collectionDropMenu" class="multiDropMenu"></div>
+      </div>
+      <select id="collectionSelect" class="multiSelectStore" multiple></select>
+      <!-- /*=== End 2_24 Edits ===*/ -->
     </div>
 
     <div class="slicer searchSlicer">
@@ -291,14 +454,18 @@
       </div>
     </div>
 
+    <!-- /*=== 2_24 Edits ===*/ -->
     <div class="slicer buttonsSlicer">
-      <label>&nbsp;</label>
-      <button id="resetBtn">Reset</button>
+      <div class="buttonRow">
+        <label>&nbsp;</label>
+        <button id="resetBtn">Reset</button>
+      </div>
+      <div class="buttonRow">
+        <label>&nbsp;</label>
+        <button id="refreshBtn">Refresh Data</button>
+      </div>
     </div>
-    <div class="slicer buttonsSlicer">
-      <label>&nbsp;</label>
-      <button id="refreshBtn">Refresh Data</button>
-    </div>
+    <!-- /*=== End 2_24 Edits ===*/ -->
   </div>
 
   <div class="row timeRangeWrap">
@@ -312,7 +479,14 @@
       <input id="timeEnd"   class="timeSlider" type="range" min="0" max="0" value="0" step="1" />
     </div>
 
-    <span id="timeLabel" class="pill">—</span>
+    <!-- /*=== 2_24 Edits ===*/ -->
+    <span id="timeLabel" class="pill timeEditPill">
+      <span>From</span>
+      <input id="timeStartEdit" class="timeEditInput" type="datetime-local" />
+      <span>to</span>
+      <input id="timeEndEdit" class="timeEditInput" type="datetime-local" />
+    </span>
+    <!-- /*=== End 2_24 Edits ===*/ -->
     <span class="pill">Drag: pan • Wheel: zoom • Shift+drag: lasso filter • Click marker: filter • Hover/click to filter</span>
   </div>
 
@@ -367,6 +541,9 @@
           <tbody id="rows"></tbody>
         </table>
       </div>
+      <!-- /*=== 2_24 Edits ===*/ -->
+      <div id="tableInfo"></div>
+      <!-- /*=== End 2_24 Edits ===*/ -->
     </div>
   </div>
 
@@ -428,6 +605,13 @@
     // UX
     DRAG_THRESHOLD_PX: 5,
     EDGE_DUP_PX: 30,
+    /*=== 2_24 Edits ===*/
+    MARKER_AGGREGATE_THRESHOLD: 4000,
+    MARKER_INTERACTION_MAX: 12000,
+    MARKER_GRID_PX: 10,
+    TABLE_MAX_ROWS: 300,
+    API_LIMIT: 100000,
+    /*=== End 2_24 Edits ===*/
   };
 
   // ======================================================
@@ -457,10 +641,24 @@
   const ctx = canvas.getContext("2d");
   const statusEl = document.getElementById("status");
   const rowsEl = document.getElementById("rows");
+  /*=== 2_24 Edits ===*/
+  const tableInfoEl = document.getElementById("tableInfo");
+  /*=== End 2_24 Edits ===*/
 
   const pocSelect = document.getElementById("pocSelect");
   const equipSelect = document.getElementById("equipSelect");
   const collectionSelect = document.getElementById("collectionSelect");
+  /*=== 2_24 Edits ===*/
+  const pocDrop = document.getElementById("pocDrop");
+  const equipDrop = document.getElementById("equipDrop");
+  const collectionDrop = document.getElementById("collectionDrop");
+  const pocDropBtn = document.getElementById("pocDropBtn");
+  const equipDropBtn = document.getElementById("equipDropBtn");
+  const collectionDropBtn = document.getElementById("collectionDropBtn");
+  const pocDropMenu = document.getElementById("pocDropMenu");
+  const equipDropMenu = document.getElementById("equipDropMenu");
+  const collectionDropMenu = document.getElementById("collectionDropMenu");
+  /*=== End 2_24 Edits ===*/
 
   const searchText = document.getElementById("searchText");
   const searchFieldRadios = Array.from(document.querySelectorAll('input[name="searchField"]'));
@@ -470,6 +668,10 @@
   const timeStart = document.getElementById("timeStart");
   const timeEnd   = document.getElementById("timeEnd");
   const timeLabel = document.getElementById("timeLabel");
+  /*=== 2_24 Edits ===*/
+  const timeStartEdit = document.getElementById("timeStartEdit");
+  const timeEndEdit = document.getElementById("timeEndEdit");
+  /*=== End 2_24 Edits ===*/
   const timeRangeFill = document.getElementById("timeRangeFill");
 
   const countPill = document.getElementById("countPill");
@@ -505,6 +707,153 @@
     selectEl.appendChild(new Option(placeholder, ""));
     for (const v of values) selectEl.appendChild(new Option(v, v));
   }
+  /*=== 2_24 Edits ===*/
+  function setMultiOptions(selectEl, values) {
+    selectEl.innerHTML = "";
+    for (const v of values) selectEl.appendChild(new Option(v, v));
+  }
+  function getSelectedValues(selectEl) {
+    return Array.from(selectEl.selectedOptions).map(o => o.value).filter(Boolean);
+  }
+  function clearMultiSelect(selectEl) {
+    for (const opt of selectEl.options) opt.selected = false;
+  }
+  function summarizeList(values, label) {
+    if (!values || !values.length) return null;
+    if (values.length <= 3) return `${label}=${values.join("|")}`;
+    return `${label}=${values.slice(0, 3).join("|")} (+${values.length - 3})`;
+  }
+  const slicerDropdownDefs = [
+    { root: pocDrop, button: pocDropBtn, menu: pocDropMenu, select: pocSelect, allLabel: "All POCs" },
+    { root: equipDrop, button: equipDropBtn, menu: equipDropMenu, select: equipSelect, allLabel: "All Equipment" },
+    { root: collectionDrop, button: collectionDropBtn, menu: collectionDropMenu, select: collectionSelect, allLabel: "All Collections" }
+  ];
+  function closeAllSlicerDropdowns(exceptRoot = null) {
+    for (const d of slicerDropdownDefs) {
+      if (exceptRoot && d.root === exceptRoot) continue;
+      d.root.classList.remove("open");
+      d.button.setAttribute("aria-expanded", "false");
+    }
+  }
+  function multiDropButtonText(values, allLabel) {
+    if (!values.length) return allLabel;
+    if (values.length <= 2) return values.join(", ");
+    return `${values.length} selected`;
+  }
+  function updateSlicerDropdownButton(selectEl, buttonEl, allLabel) {
+    const selected = getSelectedValues(selectEl);
+    buttonEl.textContent = multiDropButtonText(selected, allLabel);
+    buttonEl.title = selected.length ? selected.join(", ") : allLabel;
+  }
+  function renderSlicerDropdownMenu(selectEl, menuEl) {
+    menuEl.innerHTML = "";
+
+    const actions = document.createElement("div");
+    actions.className = "multiDropActions";
+
+    const allBtn = document.createElement("button");
+    allBtn.type = "button";
+    allBtn.className = "multiDropActionBtn";
+    allBtn.dataset.ddAction = "all";
+    allBtn.textContent = "All";
+
+    const noneBtn = document.createElement("button");
+    noneBtn.type = "button";
+    noneBtn.className = "multiDropActionBtn";
+    noneBtn.dataset.ddAction = "none";
+    noneBtn.textContent = "None";
+
+    actions.appendChild(allBtn);
+    actions.appendChild(noneBtn);
+    menuEl.appendChild(actions);
+
+    const frag = document.createDocumentFragment();
+    for (const opt of Array.from(selectEl.options)) {
+      const row = document.createElement("label");
+      row.className = "multiDropItem";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.dataset.ddValue = opt.value;
+      cb.checked = !!opt.selected;
+
+      const text = document.createElement("span");
+      text.textContent = opt.text;
+
+      row.appendChild(cb);
+      row.appendChild(text);
+      frag.appendChild(row);
+    }
+    menuEl.appendChild(frag);
+  }
+  function syncSlicerDropdown(selectEl, buttonEl, menuEl, allLabel) {
+    renderSlicerDropdownMenu(selectEl, menuEl);
+    updateSlicerDropdownButton(selectEl, buttonEl, allLabel);
+  }
+  function syncAllSlicerDropdowns() {
+    for (const d of slicerDropdownDefs) syncSlicerDropdown(d.select, d.button, d.menu, d.allLabel);
+  }
+  function wireSlicerDropdown(rootEl, selectEl, buttonEl, menuEl, allLabel) {
+    buttonEl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const willOpen = !rootEl.classList.contains("open");
+      closeAllSlicerDropdowns(willOpen ? rootEl : null);
+      rootEl.classList.toggle("open", willOpen);
+      buttonEl.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    });
+
+    menuEl.addEventListener("click", (e) => {
+      const actionBtn = e.target.closest("button[data-dd-action]");
+      if (!actionBtn) {
+        e.stopPropagation();
+        return;
+      }
+      e.stopPropagation();
+      const action = actionBtn.dataset.ddAction;
+      const shouldSelect = action === "all";
+      for (const opt of selectEl.options) opt.selected = shouldSelect;
+      syncSlicerDropdown(selectEl, buttonEl, menuEl, allLabel);
+      onFiltersChanged();
+    });
+
+    menuEl.addEventListener("change", (e) => {
+      const cb = e.target.closest("input[type='checkbox'][data-dd-value]");
+      if (!cb) return;
+      const value = cb.dataset.ddValue || "";
+      const opt = Array.from(selectEl.options).find(o => o.value === value);
+      if (!opt) return;
+      opt.selected = cb.checked;
+      updateSlicerDropdownButton(selectEl, buttonEl, allLabel);
+      onFiltersChanged();
+    });
+  }
+  function toDateTimeLocalValue(ms) {
+    if (!Number.isFinite(ms)) return "";
+    const d = new Date(ms);
+    const localMs = d.getTime() - d.getTimezoneOffset() * 60000;
+    return new Date(localMs).toISOString().slice(0, 16);
+  }
+  function fromDateTimeLocalValue(v) {
+    if (!v) return null;
+    const t = Date.parse(v);
+    return Number.isFinite(t) ? t : null;
+  }
+  function syncTimeEditorsBounds() {
+    const min = Number(timeStart.min);
+    const max = Number(timeStart.max);
+    const minVal = toDateTimeLocalValue(min);
+    const maxVal = toDateTimeLocalValue(max);
+    timeStartEdit.min = minVal;
+    timeStartEdit.max = maxVal;
+    timeEndEdit.min = minVal;
+    timeEndEdit.max = maxVal;
+  }
+  function syncTimeEditorsValues() {
+    timeStartEdit.value = toDateTimeLocalValue(startTime);
+    timeEndEdit.value = toDateTimeLocalValue(endTime);
+    timeLabel.title = `${new Date(startTime).toLocaleString()} -> ${new Date(endTime).toLocaleString()}`;
+  }
+  /*=== End 2_24 Edits ===*/
   function debounce(fn, ms) {
     let t = null;
     return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
@@ -536,7 +885,9 @@
   async function loadMarkersFromApi(options = {}) {
     const fallbackOnError = options.fallbackOnError !== false;
     try {
-      const res = await fetch("/api/sample-data?limit=2000", { cache: "no-store" });
+      /*=== 2_24 Edits ===*/
+      const res = await fetch(`/api/sample-data?limit=${CFG.API_LIMIT}`, { cache: "no-store" });
+      /*=== End 2_24 Edits ===*/
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const payload = await res.json();
       const rows = Array.isArray(payload.rows) ? payload.rows : [];
@@ -556,14 +907,12 @@
     }
   }
 
-  function restoreSelectValue(selectEl, value) {
-    if (!value) {
-      selectEl.value = "";
-      return;
-    }
-    const exists = Array.from(selectEl.options).some(o => o.value === value);
-    selectEl.value = exists ? value : "";
+  /*=== 2_24 Edits ===*/
+  function restoreSelectValues(selectEl, values) {
+    const wanted = new Set(Array.isArray(values) ? values : []);
+    for (const opt of selectEl.options) opt.selected = wanted.has(opt.value);
   }
+  /*=== End 2_24 Edits ===*/
 
   let refreshInFlight = false;
   async function refreshData(reason = "manual") {
@@ -571,9 +920,11 @@
     refreshInFlight = true;
 
     const prev = {
-      poc: pocSelect.value,
-      equip: equipSelect.value,
-      collection: collectionSelect.value,
+      /*=== 2_24 Edits ===*/
+      poc: getSelectedValues(pocSelect),
+      equip: getSelectedValues(equipSelect),
+      collection: getSelectedValues(collectionSelect),
+      /*=== End 2_24 Edits ===*/
       start: startTime,
       end: endTime
     };
@@ -585,9 +936,12 @@
       if (!ok) return;
 
       rebuildDropdowns();
-      restoreSelectValue(pocSelect, prev.poc);
-      restoreSelectValue(equipSelect, prev.equip);
-      restoreSelectValue(collectionSelect, prev.collection);
+      /*=== 2_24 Edits ===*/
+      restoreSelectValues(pocSelect, prev.poc);
+      restoreSelectValues(equipSelect, prev.equip);
+      restoreSelectValues(collectionSelect, prev.collection);
+      syncAllSlicerDropdowns();
+      /*=== End 2_24 Edits ===*/
 
       initTimelineFromMarkers();
       const minT = Number(timeStart.min);
@@ -665,6 +1019,18 @@
   let baseFiltered = [];
   let filteredAll = [];
   let filteredInView = [];
+  /*=== 2_24 Edits ===*/
+  let markerSpatialIndex = new Map();
+  let markerHitIndexReady = false;
+  let markerInteractionsEnabled = true;
+  let chartCountsCache = null;
+  let panRafId = 0;
+  let lastPanDx = 0;
+  let lastPanDy = 0;
+  let hoverRafId = 0;
+  let pendingHoverEvt = null;
+  let zoomSettleTimer = null;
+  /*=== End 2_24 Edits ===*/
 
   function getSearchField() {
     const r = searchFieldRadios.find(x => x.checked);
@@ -672,10 +1038,17 @@
   }
 
   function getFilters() {
+    /*=== 2_24 Edits ===*/
+    const pocVals = getSelectedValues(pocSelect);
+    const equipVals = getSelectedValues(equipSelect);
+    const collectionVals = getSelectedValues(collectionSelect);
+    /*=== End 2_24 Edits ===*/
     return {
-      poc: pocSelect.value || null,
-      equipment: equipSelect.value || null,
-      collection: collectionSelect.value || null,
+      /*=== 2_24 Edits ===*/
+      poc: pocVals.length ? pocVals : null,
+      equipment: equipVals.length ? equipVals : null,
+      collection: collectionVals.length ? collectionVals : null,
+      /*=== End 2_24 Edits ===*/
       searchField: getSearchField(),
       searchText: searchText.value.trim() || null,
     };
@@ -710,9 +1083,11 @@
     return markers.filter(m => {
       if (m.createdAt < startTime || m.createdAt > endTime) return false;
 
-      if (f.poc && m.poc !== f.poc) return false;
-      if (f.equipment && m.equipment !== f.equipment) return false;
-      if (f.collection && m.collection !== f.collection) return false;
+      /*=== 2_24 Edits ===*/
+      if (f.poc && !f.poc.includes(m.poc)) return false;
+      if (f.equipment && !f.equipment.includes(m.equipment)) return false;
+      if (f.collection && !f.collection.includes(m.collection)) return false;
+      /*=== End 2_24 Edits ===*/
 
       if (f.searchText) {
         const field = f.searchField;
@@ -722,38 +1097,85 @@
     });
   }
 
-  function computeFilteredSets(updateTable=true) {
+  /*=== 2_24 Edits ===*/
+  function recomputeFilteredAllFromActiveFilters() {
     const f = getFilters();
-
     baseFiltered = applySlicersAndTimeOnly(allMarkers, f);
+
     if (markerFilterId != null && !baseFiltered.some(m => m.id === markerFilterId)) markerFilterId = null;
     if (lassoFilterIds) {
       const lassoInBase = new Set(baseFiltered.filter(m => lassoFilterIds.has(m.id)).map(m => m.id));
       lassoFilterIds = lassoInBase.size ? lassoInBase : null;
     }
+
     filteredAll = baseFiltered.filter(m =>
       markerMatchesChartFilter(m, chartFilter) &&
       markerMatchesMarkerFilter(m) &&
       markerMatchesLassoFilter(m)
     );
 
+    const allowed = new Set(filteredAll.map(m => m.id));
+    for (const id of Array.from(selected)) if (!allowed.has(id)) selected.delete(id);
+    chartCountsCache = null;
+    return f;
+  }
+
+  function recomputeFilteredInViewOnly() {
     const vb = viewBbox();
     const vbCenter = (vb.minLon + vb.maxLon) / 2;
-
     filteredInView = filteredAll.filter(m => {
       let lonAdj = m.lon;
       while (lonAdj - vbCenter > 180) lonAdj -= 360;
       while (vbCenter - lonAdj > 180) lonAdj += 360;
       return (lonAdj >= vb.minLon && lonAdj <= vb.maxLon && m.lat >= vb.minLat && m.lat <= vb.maxLat);
     });
+    /*=== 2_24 Edits ===*/
+    markerInteractionsEnabled = filteredInView.length <= Math.min(CFG.MARKER_INTERACTION_MAX, CFG.MARKER_AGGREGATE_THRESHOLD);
+    /*=== End 2_24 Edits ===*/
+  }
 
-    const allowed = new Set(filteredAll.map(m => m.id));
-    for (const id of Array.from(selected)) if (!allowed.has(id)) selected.delete(id);
+  function pushMarkerHitCandidate(buckets, x, y, marker) {
+    const cell = 24;
+    const gx = Math.floor(x / cell);
+    const gy = Math.floor(y / cell);
+    const key = `${gx}|${gy}`;
+    const arr = buckets.get(key);
+    const item = { x, y, marker };
+    if (arr) arr.push(item);
+    else buckets.set(key, [item]);
+  }
+
+  function rebuildMarkerHitIndex() {
+    markerSpatialIndex = new Map();
+    markerHitIndexReady = false;
+    if (!markerInteractionsEnabled) return;
+
+    const pxPer360 = 360 / view.res;
+    for (const m of filteredInView) {
+      const p = lonLatToScreen(m.lon, m.lat);
+      pushMarkerHitCandidate(markerSpatialIndex, p.x, p.y, m);
+      if (p.x < CFG.EDGE_DUP_PX) pushMarkerHitCandidate(markerSpatialIndex, p.x + pxPer360, p.y, m);
+      if (p.x > CFG.VIEW_W - CFG.EDGE_DUP_PX) pushMarkerHitCandidate(markerSpatialIndex, p.x - pxPer360, p.y, m);
+    }
+
+    markerHitIndexReady = true;
+  }
+
+  function computeFilteredSets(updateTable = true, opts = {}) {
+    const rebuildBase = opts.rebuildBase !== false;
+    const updateChartsToo = opts.updateCharts !== false;
+    const rebuildHitIndex = opts.rebuildHitIndex !== false;
+
+    const f = rebuildBase ? recomputeFilteredAllFromActiveFilters() : getFilters();
+    recomputeFilteredInViewOnly();
+    if (rebuildHitIndex) rebuildMarkerHitIndex();
+    else markerHitIndexReady = false;
 
     updatePills(f);
     if (updateTable) renderTable();
-    updateCharts();
+    if (updateChartsToo) updateCharts(true);
   }
+  /*=== End 2_24 Edits ===*/
 
   function updatePills(f) {
     countPill.textContent = `${filteredInView.length} visible`;
@@ -761,21 +1183,34 @@
     selPill.textContent = `Selected: ${selected.size}`;
 
     const parts = [];
-    if (f.poc) parts.push(`POC=${f.poc}`);
-    if (f.equipment) parts.push(`Equip=${f.equipment}`);
-    if (f.collection) parts.push(`Collection=${f.collection}`);
+    /*=== 2_24 Edits ===*/
+    const pocSummary = summarizeList(f.poc, "POC");
+    const equipSummary = summarizeList(f.equipment, "Equip");
+    const collectionSummary = summarizeList(f.collection, "Collection");
+    if (pocSummary) parts.push(pocSummary);
+    if (equipSummary) parts.push(equipSummary);
+    if (collectionSummary) parts.push(collectionSummary);
+    /*=== End 2_24 Edits ===*/
     if (f.searchText) parts.push(`${f.searchField}~${f.searchText}`);
     if (markerFilterId != null) parts.push(`Marker=${markerFilterId}`);
     if (lassoFilterIds) parts.push(`Lasso=${lassoFilterIds.size}`);
+    /*=== 2_24 Edits ===*/
+    if (chartFilter) {
+      const chartLabel = chartFilter.type === "tac" ? `TAC ${chartFilter.value}` : chartFilter.value;
+      parts.push(`Chart=${chartFilter.type}:${chartLabel}`);
+    }
+    /*=== End 2_24 Edits ===*/
     filterPill.textContent = parts.length ? `Filters: ${parts.join(", ")}` : "Filters: —";
   }
-
   // ======================================================
   // TABLE
   // ======================================================
   function renderTable() {
     rowsEl.innerHTML = "";
-    for (const m of filteredInView) {
+    /*=== 2_24 Edits ===*/
+    const capped = filteredInView.slice(0, CFG.TABLE_MAX_ROWS);
+    const frag = document.createDocumentFragment();
+    for (const m of capped) {
       const tr = document.createElement("tr");
       if (selected.has(m.id)) tr.classList.add("selected");
       if (hoverFilter && markerMatchesChartFilter(m, hoverFilter)) tr.classList.add("hoverMatch");
@@ -798,8 +1233,18 @@
         renderTable();
       });
 
-      rowsEl.appendChild(tr);
+      frag.appendChild(tr);
     }
+    rowsEl.appendChild(frag);
+
+    if (tableInfoEl) {
+      if (filteredInView.length > capped.length) {
+        tableInfoEl.textContent = `Showing ${capped.length} of ${filteredInView.length} visible rows`;
+      } else {
+        tableInfoEl.textContent = `Showing ${filteredInView.length} visible rows`;
+      }
+    }
+    /*=== End 2_24 Edits ===*/
   }
 
   // ======================================================
@@ -1048,7 +1493,49 @@
   // ======================================================
   // MARKER DRAW
   // ======================================================
+  /*=== 2_24 Edits ===*/
+  function drawAggregatedMarkers() {
+    const cell = CFG.MARKER_GRID_PX;
+    const grid = new Map();
+    const pxPer360 = 360 / view.res;
+
+    function bump(x, y) {
+      if (x < -cell || x > CFG.VIEW_W + cell || y < -cell || y > CFG.VIEW_H + cell) return;
+      const gx = Math.floor(x / cell);
+      const gy = Math.floor(y / cell);
+      const key = `${gx}|${gy}`;
+      const existing = grid.get(key);
+      if (existing) existing.count++;
+      else grid.set(key, { x: gx * cell + cell * 0.5, y: gy * cell + cell * 0.5, count: 1 });
+    }
+
+    for (const m of filteredInView) {
+      const p = lonLatToScreen(m.lon, m.lat);
+      bump(p.x, p.y);
+      if (p.x < CFG.EDGE_DUP_PX) bump(p.x + pxPer360, p.y);
+      if (p.x > CFG.VIEW_W - CFG.EDGE_DUP_PX) bump(p.x - pxPer360, p.y);
+    }
+
+    for (const cellInfo of grid.values()) {
+      const c = cellInfo.count;
+      const radius = Math.min(9, 1.5 + Math.log2(c + 1) * 1.2);
+      const alpha = Math.min(0.9, 0.16 + Math.log10(c + 1) * 0.35);
+      ctx.beginPath();
+      ctx.arc(cellInfo.x, cellInfo.y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,0,0,${alpha})`;
+      ctx.fill();
+    }
+  }
+  /*=== End 2_24 Edits ===*/
+
   function drawMarkers() {
+    /*=== 2_24 Edits ===*/
+    if (filteredInView.length > CFG.MARKER_AGGREGATE_THRESHOLD) {
+      drawAggregatedMarkers();
+      return;
+    }
+    /*=== End 2_24 Edits ===*/
+
     for (const m of filteredInView) {
       const p = lonLatToScreen(m.lon, m.lat);
       const hoverMatch = hoverFilter && markerMatchesChartFilter(m, hoverFilter);
@@ -1114,24 +1601,33 @@
 
   function findMarkerAtCanvasPoint(px, py) {
     const HIT_R = 9;
+    /*=== 2_24 Edits ===*/
+    if (!markerInteractionsEnabled) return null;
+    if (!markerHitIndexReady || !markerSpatialIndex.size) return null;
+
+    const cell = 24;
+    const reach = Math.ceil(HIT_R / cell);
+    const gx0 = Math.floor(px / cell);
+    const gy0 = Math.floor(py / cell);
+    /*=== End 2_24 Edits ===*/
     let best = null;
     let bestDist = Infinity;
 
-    for (const m of filteredInView) {
-      const p = lonLatToScreen(m.lon, m.lat);
-      const pts = [{ x: p.x, y: p.y }];
-      const pxPer360 = 360 / view.res;
-      if (p.x < CFG.EDGE_DUP_PX) pts.push({ x: p.x + pxPer360, y: p.y });
-      if (p.x > CFG.VIEW_W - CFG.EDGE_DUP_PX) pts.push({ x: p.x - pxPer360, y: p.y });
-
-      for (const q of pts) {
-        const d = Math.hypot(px - q.x, py - q.y);
-        if (d <= HIT_R && d < bestDist) {
-          bestDist = d;
-          best = m;
+    /*=== 2_24 Edits ===*/
+    for (let gy = gy0 - reach; gy <= gy0 + reach; gy++) {
+      for (let gx = gx0 - reach; gx <= gx0 + reach; gx++) {
+        const bucket = markerSpatialIndex.get(`${gx}|${gy}`);
+        if (!bucket) continue;
+        for (const q of bucket) {
+          const d = Math.hypot(px - q.x, py - q.y);
+          if (d <= HIT_R && d < bestDist) {
+            bestDist = d;
+            best = q.marker;
+          }
         }
       }
     }
+    /*=== End 2_24 Edits ===*/
     return best;
   }
 
@@ -1187,6 +1683,25 @@
     chartTip.style.top  = (evt.clientY + 12) + "px";
   }
   function hideTip() { chartTip.style.display = "none"; }
+
+  /*=== 2_24 Edits ===*/
+  function sameFilterObj(a, b) {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    return a.type === b.type && a.value === b.value;
+  }
+  /*=== End 2_24 Edits ===*/
+
+  /*=== 2_24 Edits ===*/
+  function chartLabelToFilter(filterType, label) {
+    if (!label || label === "Other") return null;
+    if (filterType === "tac") {
+      if (!String(label).startsWith("TAC ")) return null;
+      return { type: "tac", value: String(label).slice(4) };
+    }
+    return { type: filterType, value: String(label) };
+  }
+  /*=== End 2_24 Edits ===*/
 
   function drawPieChart(canvas, legendEl, counts, opts = {}) {
     const c2 = canvas.getContext("2d");
@@ -1246,8 +1761,20 @@
     for (const [label, val] of shown) {
       const frac = val / total;
       const a2 = normAngle(angle + frac * TAU);
+      /*=== 2_24 Edits ===*/
+      const isFullCircle = frac >= 0.999999;
+      /*=== End 2_24 Edits ===*/
 
-      ringSlicePath(angle, a2);
+      /*=== 2_24 Edits ===*/
+      if (isFullCircle) {
+        c2.beginPath();
+        c2.arc(cx, cy, r, 0, TAU);
+        c2.arc(cx, cy, innerR, TAU, 0, true);
+        c2.closePath();
+      } else {
+        ringSlicePath(angle, a2);
+      }
+      /*=== End 2_24 Edits ===*/
 
       const hue = hashToHue(label);
       c2.fillStyle = `hsl(${hue} 70% 55%)`;
@@ -1260,14 +1787,25 @@
       const isHover = hoverLabel && label === hoverLabel;
       if (isSel || isHover) {
         c2.save();
-        ringSlicePath(angle, a2);
+        /*=== 2_24 Edits ===*/
+        if (isFullCircle) {
+          c2.beginPath();
+          c2.arc(cx, cy, r, 0, TAU);
+          c2.arc(cx, cy, innerR, TAU, 0, true);
+          c2.closePath();
+        } else {
+          ringSlicePath(angle, a2);
+        }
+        /*=== End 2_24 Edits ===*/
         c2.lineWidth = isSel ? 5 : 3;
         c2.strokeStyle = isSel ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.45)";
         c2.stroke();
         c2.restore();
       }
 
-      canvas._slices.push({ label, start: angle, end: a2, cx, cy, r, innerR, val, total });
+      /*=== 2_24 Edits ===*/
+      canvas._slices.push({ label, start: angle, end: a2, cx, cy, r, innerR, val, total, isFullCircle });
+      /*=== End 2_24 Edits ===*/
       angle = a2;
     }
 
@@ -1289,15 +1827,23 @@
     c2.fillText(String(total), cx, cy + 11);
     c2.restore();
 
+    /*=== 2_24 Edits ===*/
+    const filterType = opts.filterType || "";
+    /*=== End 2_24 Edits ===*/
     legendEl.innerHTML = shown.map(([label, val]) => {
       const pct = ((val / total) * 100).toFixed(1);
       const hue = hashToHue(label);
+      const isSel = selectedLabel && label === selectedLabel;
+      const isClickable = !!chartLabelToFilter(filterType, label);
+      const itemClass = `legendItem${isSel ? " is-selected" : ""}`;
+      const labelSafe = escapeHtml(label);
+      const disabledAttrs = isClickable ? "" : ' disabled aria-disabled="true"';
       return `
-        <div style="display:flex;align-items:center;gap:8px;margin:2px 0;">
+        <button type="button" class="${itemClass}" data-legend-label="${labelSafe}"${disabledAttrs}>
           <span style="width:10px;height:10px;border-radius:2px;background:hsl(${hue} 70% 55%);display:inline-block;"></span>
-          <span>${escapeHtml(label)}</span>
+          <span>${labelSafe}</span>
           <span style="margin-left:auto;opacity:0.75;">${val} (${pct}%)</span>
-        </div>`;
+        </button>`;
     }).join("");
   }
 
@@ -1311,6 +1857,9 @@
       const dy = y - s.cy;
       const dist = Math.hypot(dx, dy);
       if (dist > s.r || dist < s.innerR) continue;
+      /*=== 2_24 Edits ===*/
+      if (s.isFullCircle) return s;
+      /*=== End 2_24 Edits ===*/
 
       const a = normAngle(Math.atan2(dy, dx));
       const start = s.start, end = s.end;
@@ -1325,34 +1874,43 @@
     return null;
   }
 
-  function updateCharts() {
+  /*=== 2_24 Edits ===*/
+  function buildCounts(source) {
+    const imsiCounts = {};
+    const deviceCounts = {};
+    const countryCounts = {};
+    const providerCounts = {};
 
-    function buildCounts(source) {
-      const imsiCounts = {};
-      const deviceCounts = {};
-      const countryCounts = {};
-      const providerCounts = {};
+    for (const m of source) {
+      const p5 = getImsiPrefix5(m.imsi);
+      imsiCounts[p5] = (imsiCounts[p5] || 0) + 1;
 
-      for (const m of source) {
-        const p5 = getImsiPrefix5(m.imsi);
-        imsiCounts[p5] = (imsiCounts[p5] || 0) + 1;
+      const dev = getDeviceLabelFromImei(m.imei);
+      deviceCounts[dev] = (deviceCounts[dev] || 0) + 1;
 
-        const dev = getDeviceLabelFromImei(m.imei);
-        deviceCounts[dev] = (deviceCounts[dev] || 0) + 1;
+      const c = String(m.country || "Unknown");
+      countryCounts[c] = (countryCounts[c] || 0) + 1;
 
-        const c = String(m.country || "Unknown");
-        countryCounts[c] = (countryCounts[c] || 0) + 1;
-
-        const p = String(m.provider || "Unknown");
-        providerCounts[p] = (providerCounts[p] || 0) + 1;
-      }
-
-      return { imsiCounts, deviceCounts, countryCounts, providerCounts };
+      const p = String(m.provider || "Unknown");
+      providerCounts[p] = (providerCounts[p] || 0) + 1;
     }
 
+    return { imsiCounts, deviceCounts, countryCounts, providerCounts };
+  }
+
+  function refreshChartCountsCache() {
+    chartCountsCache = {
+      allCounts: buildCounts(baseFiltered),
+      filteredCounts: buildCounts(filteredAll)
+    };
+  }
+
+  function updateCharts(recomputeCounts = false) {
+    const chartMaxSlices = 25;
+    if (recomputeCounts || !chartCountsCache) refreshChartCountsCache();
+    const allCounts = chartCountsCache.allCounts;
+    const filteredCounts = chartCountsCache.filteredCounts;
     // If a chart is selected, filter the other charts by that selection.
-    const allCounts = buildCounts(baseFiltered);
-    const filteredCounts = buildCounts(filteredAll);
 
     const imsiSourceCounts = (chartFilter?.type === "imsi5") ? allCounts.imsiCounts : filteredCounts.imsiCounts;
     const deviceSourceCounts = (chartFilter?.type === "tac") ? allCounts.deviceCounts : filteredCounts.deviceCounts;
@@ -1360,29 +1918,34 @@
     const providerSourceCounts = (chartFilter?.type === "provider") ? allCounts.providerCounts : filteredCounts.providerCounts;
 
     drawPieChart(imsiPie, imsiLegend, imsiSourceCounts, {
-      maxSlices: 10,
+      maxSlices: chartMaxSlices,
+      filterType: "imsi5",
       selectedLabel: (chartFilter?.type === "imsi5") ? chartFilter.value : null,
       hoverLabel: hoverImsiLabel
     });
 
     drawPieChart(devicePie, deviceLegend, deviceSourceCounts, {
-      maxSlices: 10,
+      maxSlices: chartMaxSlices,
+      filterType: "tac",
       selectedLabel: (chartFilter?.type === "tac") ? `TAC ${chartFilter.value}` : null,
       hoverLabel: hoverDeviceLabel
     });
 
     drawPieChart(countryPie, countryLegend, countrySourceCounts, {
-      maxSlices: 10,
+      maxSlices: chartMaxSlices,
+      filterType: "country",
       selectedLabel: (chartFilter?.type === "country") ? chartFilter.value : null,
       hoverLabel: hoverCountryLabel
     });
 
     drawPieChart(providerPie, providerLegend, providerSourceCounts, {
-      maxSlices: 10,
+      maxSlices: chartMaxSlices,
+      filterType: "provider",
       selectedLabel: (chartFilter?.type === "provider") ? chartFilter.value : null,
       hoverLabel: hoverProviderLabel
     });
   }
+  /*=== End 2_24 Edits ===*/
 
   function toggleChartFilter(next) {
     if (chartFilter && chartFilter.type === next.type && chartFilter.value === next.value) chartFilter = null;
@@ -1418,28 +1981,67 @@
     toggleChartFilter({ type: "provider", value: s.label });
   });
 
+  /*=== 2_24 Edits ===*/
+  function wireLegend(legendEl, filterType) {
+    legendEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-legend-label]");
+      if (!btn || btn.disabled) return;
+      const next = chartLabelToFilter(filterType, btn.dataset.legendLabel || "");
+      if (!next) return;
+      toggleChartFilter(next);
+    });
+  }
+  /*=== End 2_24 Edits ===*/
+
+  /*=== 2_24 Edits ===*/
+  wireLegend(imsiLegend, "imsi5");
+  wireLegend(deviceLegend, "tac");
+  wireLegend(countryLegend, "country");
+  wireLegend(providerLegend, "provider");
+  /*=== End 2_24 Edits ===*/
+
   // Hover handlers (tooltip + cross-highlight)
   function wireHover(canvasEl, setHoverLabel, getHoverLabel, filterObjBuilder, title) {
     canvasEl.addEventListener("mousemove", (e) => {
       const s = pieHitTest(canvasEl, e);
       if (!s || s.label === "Other") {
+        /*=== 2_24 Edits ===*/
+        if (getHoverLabel() == null && hoverFilter == null) {
+          hideTip();
+          canvasEl.style.cursor = "default";
+          return;
+        }
+        /*=== End 2_24 Edits ===*/
         setHoverLabel(null);
         hideTip();
         hoverFilter = null;
         renderTable();
-        updateCharts();
+        /*=== 2_24 Edits ===*/
+        updateCharts(false);
+        /*=== End 2_24 Edits ===*/
         canvasEl.style.cursor = "default";
         redraw();
         return;
       }
 
-      setHoverLabel(s.label);
+      /*=== 2_24 Edits ===*/
+      const prevHoverLabel = getHoverLabel();
+      /*=== End 2_24 Edits ===*/
       const pct = ((s.val / s.total) * 100).toFixed(1);
       showTip(e, `<b>${escapeHtml(title)}</b>: ${escapeHtml(s.label)}<br>${s.val} (${pct}%)`);
 
-      hoverFilter = filterObjBuilder(s.label);
+      const nextHoverFilter = filterObjBuilder(s.label);
+      if (prevHoverLabel === s.label && sameFilterObj(hoverFilter, nextHoverFilter)) {
+        canvasEl.style.cursor = "pointer";
+        return;
+      }
+
+      setHoverLabel(s.label);
+      hoverFilter = nextHoverFilter;
       renderTable();
-      updateCharts();
+      /*=== 2_24 Edits ===*/
+      updateCharts(false);
+      /*=== End 2_24 Edits ===*/
       canvasEl.style.cursor = "pointer";
       redraw();
     });
@@ -1449,7 +2051,9 @@
       hideTip();
       hoverFilter = null;
       renderTable();
-      updateCharts();
+      /*=== 2_24 Edits ===*/
+      updateCharts(false);
+      /*=== End 2_24 Edits ===*/
       redraw();
     });
   }
@@ -1494,6 +2098,10 @@
       startTime = endTime = t;
       timeStart.value = String(startTime);
       timeEnd.value   = String(endTime);
+      /*=== 2_24 Edits ===*/
+      syncTimeEditorsBounds();
+      syncTimeEditorsValues();
+      /*=== End 2_24 Edits ===*/
       return;
     }
 
@@ -1507,6 +2115,9 @@
     timeStart.min = timeEnd.min = String(minT);
     timeStart.max = timeEnd.max = String(maxT);
     timeStart.step = timeEnd.step = String(step);
+    /*=== 2_24 Edits ===*/
+    syncTimeEditorsBounds();
+    /*=== End 2_24 Edits ===*/
 
     startTime = minT;
     endTime   = maxT;
@@ -1514,9 +2125,12 @@
     timeEnd.value   = String(endTime);
   }
 
-  function syncTimeRange() {
-    let s = Number(timeStart.value);
-    let e = Number(timeEnd.value);
+  /*=== 2_24 Edits ===*/
+  function syncTimeRange(nextStart = Number(timeStart.value), nextEnd = Number(timeEnd.value)) {
+    const min = Number(timeStart.min);
+    const max = Number(timeStart.max);
+    let s = clamp(Number(nextStart), min, max);
+    let e = clamp(Number(nextEnd), min, max);
 
     if (s > e) {
       if (lastTimeChanged === "start") s = e;
@@ -1529,11 +2143,9 @@
     timeStart.value = String(startTime);
     timeEnd.value   = String(endTime);
 
-    timeLabel.textContent = `${new Date(startTime).toLocaleString()} → ${new Date(endTime).toLocaleString()}`;
+    syncTimeEditorsValues();
 
     // fill bar
-    const min = Number(timeStart.min);
-    const max = Number(timeStart.max);
     const span = Math.max(1, max - min);
 
     const leftPct = ((startTime - min) / span) * 100;
@@ -1547,10 +2159,14 @@
   // UI INIT (dropdowns)
   // ======================================================
   function rebuildDropdowns() {
-    setOptions(pocSelect, uniqSorted(allMarkers.map(m => m.poc)), "All POCs");
-    setOptions(equipSelect, uniqSorted(allMarkers.map(m => m.equipment)), "All Equipment");
-    setOptions(collectionSelect, uniqSorted(allMarkers.map(m => m.collection)), "All Collections");
+    /*=== 2_24 Edits ===*/
+    setMultiOptions(pocSelect, uniqSorted(allMarkers.map(m => m.poc)));
+    setMultiOptions(equipSelect, uniqSorted(allMarkers.map(m => m.equipment)));
+    setMultiOptions(collectionSelect, uniqSorted(allMarkers.map(m => m.collection)));
+    syncAllSlicerDropdowns();
+    /*=== End 2_24 Edits ===*/
   }
+  /*=== End 2_24 Edits ===*/
 
   // ======================================================
   // INTERACTION: pan/zoom/lasso/click-add
@@ -1559,12 +2175,64 @@
   let didDrag = false;
   let panning = false;
   let start = null;
+  /*=== 2_24 Edits ===*/
+  function schedulePanFrame() {
+    if (panRafId) return;
+    panRafId = requestAnimationFrame(() => {
+      panRafId = 0;
+      if (!panning || !start) return;
+      view.lon = wrapLon(start.lon - lastPanDx * view.res);
+      view.lat = clampLat(start.lat + lastPanDy * view.res);
+      computeFilteredSets(false, { rebuildBase: false, updateCharts: false, rebuildHitIndex: false });
+      redraw();
+    });
+  }
+
+  function processMarkerHover() {
+    hoverRafId = 0;
+    if (!pendingHoverEvt) return;
+    const evt = pendingHoverEvt;
+    pendingHoverEvt = null;
+
+    if (!markerInteractionsEnabled) {
+      if (hoveredMarkerId != null) {
+        hoveredMarkerId = null;
+        redraw();
+      }
+      hideMarkerTip();
+      if (!chartTip || chartTip.style.display === "none") canvas.style.cursor = "default";
+      return;
+    }
+
+    const hit = findMarkerAtCanvasPoint(evt.offsetX, evt.offsetY);
+    if (!hit) {
+      if (hoveredMarkerId != null) {
+        hoveredMarkerId = null;
+        redraw();
+      }
+      hideMarkerTip();
+      if (!chartTip || chartTip.style.display === "none") canvas.style.cursor = "default";
+      return;
+    }
+
+    if (hoveredMarkerId !== hit.id) {
+      hoveredMarkerId = hit.id;
+      redraw();
+    }
+    showMarkerTip(evt, hit);
+    canvas.style.cursor = "pointer";
+  }
+  /*=== End 2_24 Edits ===*/
 
   canvas.addEventListener("mousedown", (e) => {
     if (e.button !== 0) return;
     mouseDown = true;
     didDrag = false;
     start = { x: e.clientX, y: e.clientY, lon: view.lon, lat: view.lat };
+    /*=== 2_24 Edits ===*/
+    lastPanDx = 0;
+    lastPanDy = 0;
+    /*=== End 2_24 Edits ===*/
     hoveredMarkerId = null;
     hideMarkerTip();
 
@@ -1596,10 +2264,11 @@
     }
 
     if (panning) {
-      view.lon = wrapLon(start.lon - dx * view.res);
-      view.lat = clampLat(start.lat + dy * view.res);
-      computeFilteredSets(false);
-      redraw();
+      /*=== 2_24 Edits ===*/
+      lastPanDx = dx;
+      lastPanDy = dy;
+      schedulePanFrame();
+      /*=== End 2_24 Edits ===*/
     }
   });
 
@@ -1620,7 +2289,15 @@
     if (panning) {
       panning = false;
       canvas.classList.remove("dragging");
-      computeFilteredSets(true);
+      /*=== 2_24 Edits ===*/
+      if (panRafId) {
+        cancelAnimationFrame(panRafId);
+        panRafId = 0;
+      }
+      view.lon = wrapLon(start.lon - lastPanDx * view.res);
+      view.lat = clampLat(start.lat + lastPanDy * view.res);
+      computeFilteredSets(true, { rebuildBase: false, updateCharts: false, rebuildHitIndex: true });
+      /*=== End 2_24 Edits ===*/
       redraw();
       if (didDrag) scheduleFetch("pan-end");
     }
@@ -1628,27 +2305,25 @@
 
   canvas.addEventListener("mousemove", (e) => {
     if (mouseDown || lassoActive || panning) return;
-
-    const hit = findMarkerAtCanvasPoint(e.offsetX, e.offsetY);
-    if (!hit) {
-      if (hoveredMarkerId != null) {
-        hoveredMarkerId = null;
-        redraw();
-      }
-      hideMarkerTip();
-      if (!chartTip || chartTip.style.display === "none") canvas.style.cursor = "default";
-      return;
-    }
-
-    if (hoveredMarkerId !== hit.id) {
-      hoveredMarkerId = hit.id;
-      redraw();
-    }
-    showMarkerTip(e, hit);
-    canvas.style.cursor = "pointer";
+    /*=== 2_24 Edits ===*/
+    pendingHoverEvt = {
+      offsetX: e.offsetX,
+      offsetY: e.offsetY,
+      clientX: e.clientX,
+      clientY: e.clientY
+    };
+    if (!hoverRafId) hoverRafId = requestAnimationFrame(processMarkerHover);
+    /*=== End 2_24 Edits ===*/
   });
 
   canvas.addEventListener("mouseleave", () => {
+    /*=== 2_24 Edits ===*/
+    pendingHoverEvt = null;
+    if (hoverRafId) {
+      cancelAnimationFrame(hoverRafId);
+      hoverRafId = 0;
+    }
+    /*=== End 2_24 Edits ===*/
     if (hoveredMarkerId != null) {
       hoveredMarkerId = null;
       redraw();
@@ -1661,6 +2336,9 @@
     if (didDrag) return;
     if (lassoActive) return;
     if (e.shiftKey) return;
+    /*=== 2_24 Edits ===*/
+    if (!markerInteractionsEnabled) return;
+    /*=== End 2_24 Edits ===*/
 
     const clickedMarker = findMarkerAtCanvasPoint(e.offsetX, e.offsetY);
     if (clickedMarker) {
@@ -1686,8 +2364,17 @@
     view.lon = wrapLon(lon0 - ((e.offsetX / CFG.VIEW_W) - 0.5) * widthDeg);
     view.lat = clampLat(lat0 + ((e.offsetY / CFG.VIEW_H) - 0.5) * heightDeg);
 
-    computeFilteredSets(false);
+    /*=== 2_24 Edits ===*/
+    computeFilteredSets(false, { rebuildBase: false, updateCharts: false, rebuildHitIndex: false });
+    /*=== End 2_24 Edits ===*/
     redraw();
+    /*=== 2_24 Edits ===*/
+    if (zoomSettleTimer) clearTimeout(zoomSettleTimer);
+    zoomSettleTimer = setTimeout(() => {
+      computeFilteredSets(true, { rebuildBase: false, updateCharts: false, rebuildHitIndex: true });
+      redraw();
+    }, 140);
+    /*=== End 2_24 Edits ===*/
     scheduleFetch("zoom-end");
   }, { passive:false });
 
@@ -1699,9 +2386,16 @@
     redraw();
   }
 
-  pocSelect.addEventListener("change", onFiltersChanged);
-  equipSelect.addEventListener("change", onFiltersChanged);
-  collectionSelect.addEventListener("change", onFiltersChanged);
+  /*=== 2_24 Edits ===*/
+  wireSlicerDropdown(pocDrop, pocSelect, pocDropBtn, pocDropMenu, "All POCs");
+  wireSlicerDropdown(equipDrop, equipSelect, equipDropBtn, equipDropMenu, "All Equipment");
+  wireSlicerDropdown(collectionDrop, collectionSelect, collectionDropBtn, collectionDropMenu, "All Collections");
+
+  document.addEventListener("click", () => closeAllSlicerDropdowns());
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAllSlicerDropdowns();
+  });
+  /*=== End 2_24 Edits ===*/
 
   const updateFiltersDebounced = debounce(() => {
     computeFilteredSets(true);
@@ -1727,9 +2421,12 @@
   });
 
   resetBtn.addEventListener("click", () => {
-    pocSelect.value = "";
-    equipSelect.value = "";
-    collectionSelect.value = "";
+    /*=== 2_24 Edits ===*/
+    clearMultiSelect(pocSelect);
+    clearMultiSelect(equipSelect);
+    clearMultiSelect(collectionSelect);
+    syncAllSlicerDropdowns();
+    /*=== End 2_24 Edits ===*/
 
     searchText.value = "";
     const defaultRadio = document.querySelector('input[name="searchField"][value="imsi"]');
@@ -1776,6 +2473,23 @@
     computeFilteredSets(true);
     redraw();
   });
+  /*=== 2_24 Edits ===*/
+  timeStartEdit.addEventListener("change", () => {
+    lastTimeChanged = "start";
+    const s = fromDateTimeLocalValue(timeStartEdit.value);
+    syncTimeRange(s ?? startTime, endTime);
+    computeFilteredSets(true);
+    redraw();
+  });
+
+  timeEndEdit.addEventListener("change", () => {
+    lastTimeChanged = "end";
+    const e = fromDateTimeLocalValue(timeEndEdit.value);
+    syncTimeRange(startTime, e ?? endTime);
+    computeFilteredSets(true);
+    redraw();
+  });
+  /*=== End 2_24 Edits ===*/
 
   // ======================================================
   // INIT
